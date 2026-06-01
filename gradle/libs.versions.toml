@@ -1,5 +1,8 @@
 [versions]
 agp = "9.2.1"
+# AGP 9 applies the Kotlin Gradle plugin itself, so no kotlin-android plugin alias here.
+# This version is the anchor for KSP (must share Kotlin's major.minor) and for the
+# Compose compiler plugin added in Plan 1B; keep it aligned with the Kotlin that AGP bundles.
 kotlin = "2.1.21"
 ksp = "2.1.21-2.0.2"
 coreKtx = "1.18.0"
