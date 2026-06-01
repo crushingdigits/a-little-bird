@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>BBC Sport - Liverpool</title>
+  <entry>
+    <title>New set-piece coach lined up</title>
+    <link href="https://example.com/c" />
+    <id>tag:example.com,2026:/c</id>
+    <updated>2026-06-01T07:00:00Z</updated>
+    <author><name>BBC Sport</name></author>
+    <summary>Backroom reshape continues.</summary>
+  </entry>
+</feed>

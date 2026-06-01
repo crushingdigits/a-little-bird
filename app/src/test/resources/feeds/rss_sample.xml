@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+  <channel>
+    <title>This Is Anfield</title>
+    <item>
+      <title><![CDATA[Liverpool agree deal for midfielder]]></title>
+      <link>https://example.com/a</link>
+      <guid>https://example.com/a</guid>
+      <pubDate>Mon, 01 Jun 2026 09:00:00 +0000</pubDate>
+      <dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">David Ornstein</dc:creator>
+      <description><![CDATA[<p>Here we go! Personal terms agreed.</p>]]></description>
+      <media:content url="https://example.com/a.jpg" />
+    </item>
+    <item>
+      <title>Player ratings: 2-1 win</title>
+      <link>https://example.com/b</link>
+      <pubDate>Mon, 01 Jun 2026 08:00:00 +0000</pubDate>
+      <description>Full-time report.</description>
+    </item>
+  </channel>
+</rss>
