@@ -1,7 +1,15 @@
 package dev.crushingdigits.littlebird.ui
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.unit.dp
 import com.github.takahirom.roborazzi.RobolectricDeviceQualifiers
 import com.github.takahirom.roborazzi.RoborazziOptions
 import com.github.takahirom.roborazzi.captureRoboImage
@@ -26,13 +34,29 @@ private val DefaultRoborazziOptions = RoborazziOptions(
     recordOptions = RoborazziOptions.RecordOptions(resizeScale = 0.5),
 )
 
+/**
+ * Renders [content] exactly as the Feed does: inside the dark [LittleBirdTheme] AND a
+ * [Surface] painted with the theme surface color, so translucent cards and content colors
+ * resolve against the real dark background (not a bare white root).
+ */
+private fun ComposeContentTestRule.captureThemed(filePath: String, content: @Composable () -> Unit) {
+    setContent {
+        LittleBirdTheme {
+            Surface(color = MaterialTheme.colorScheme.surface) {
+                Box(Modifier.padding(16.dp)) { content() }
+            }
+        }
+    }
+    onRoot().captureRoboImage(filePath = filePath, roborazziOptions = DefaultRoborazziOptions)
+}
+
 private fun newsItem(
     tier: Tier,
     category: Category = Category.TRANSFER,
     confirmed: Boolean = false,
     isMatch: Boolean = false,
-    source: String = "FabrizioRomano",
-    title: String = "Arsenal agree £65m fee for top target",
+    source: String = "Fabrizio Romano",
+    title: String = "Liverpool agree £65m fee for top midfield target",
     summary: String = "Exclusive: deal imminent, medical scheduled this week.",
 ) = NewsItem(
     id = "test-id",
@@ -63,142 +87,85 @@ class FeedComponentsScreenshotTest {
 
     @Test
     fun `news card - tier1 reliable confirmed`() {
-        composeTestRule.setContent {
-            LittleBirdTheme {
-                NewsCard(
-                    item = newsItem(
-                        tier = Tier.TIER_1_RELIABLE,
-                        category = Category.TRANSFER,
-                        confirmed = true,
-                    ),
-                    relativeTime = "2h ago",
-                    onClick = {},
-                )
-            }
+        composeTestRule.captureThemed("FeedComponentsScreenshotTest_news_card_tier1_reliable_confirmed.png") {
+            NewsCard(
+                item = newsItem(tier = Tier.TIER_1_RELIABLE, category = Category.TRANSFER, confirmed = true),
+                relativeTime = "2h ago",
+                onClick = {},
+            )
         }
-        composeTestRule.onRoot().captureRoboImage(
-            filePath = "FeedComponentsScreenshotTest_news_card_tier1_reliable_confirmed.png",
-            roborazziOptions = DefaultRoborazziOptions,
-        )
     }
 
     @Test
     fun `news card - tier2 beat`() {
-        composeTestRule.setContent {
-            LittleBirdTheme {
-                NewsCard(
-                    item = newsItem(
-                        tier = Tier.TIER_2_BEAT,
-                        category = Category.CONTRACT,
-                        confirmed = false,
-                        source = "The Athletic",
-                        title = "Midfielder stalling on contract renewal",
-                        summary = "Talks have broken down, club exploring alternatives.",
-                    ),
-                    relativeTime = "45m ago",
-                    onClick = {},
-                )
-            }
+        composeTestRule.captureThemed("FeedComponentsScreenshotTest_news_card_tier2_beat.png") {
+            NewsCard(
+                item = newsItem(
+                    tier = Tier.TIER_2_BEAT,
+                    category = Category.CONTRACT,
+                    source = "This Is Anfield",
+                    title = "Academy graduate close to signing new long-term deal",
+                    summary = "Talks advancing, announcement expected soon.",
+                ),
+                relativeTime = "45m ago",
+                onClick = {},
+            )
         }
-        composeTestRule.onRoot().captureRoboImage(
-            filePath = "FeedComponentsScreenshotTest_news_card_tier2_beat.png",
-            roborazziOptions = DefaultRoborazziOptions,
-        )
     }
 
     @Test
     fun `news card - tier3 speculative`() {
-        composeTestRule.setContent {
-            LittleBirdTheme {
-                NewsCard(
-                    item = newsItem(
-                        tier = Tier.TIER_3_SPECULATIVE,
-                        category = Category.COACHING,
-                        confirmed = false,
-                        source = "TalkSport",
-                        title = "Rumours linking club with shock managerial appointment",
-                        summary = "Sources claim negotiations have begun behind closed doors.",
-                    ),
-                    relativeTime = "3h ago",
-                    onClick = {},
-                )
-            }
+        composeTestRule.captureThemed("FeedComponentsScreenshotTest_news_card_tier3_speculative.png") {
+            NewsCard(
+                item = newsItem(
+                    tier = Tier.TIER_3_SPECULATIVE,
+                    category = Category.COACHING,
+                    source = "Daily Mirror",
+                    title = "Reds 'eyeing' shock swoop for La Liga forward, claim reports",
+                    summary = "Speculation links the club with a surprise move.",
+                ),
+                relativeTime = "3h ago",
+                onClick = {},
+            )
         }
-        composeTestRule.onRoot().captureRoboImage(
-            filePath = "FeedComponentsScreenshotTest_news_card_tier3_speculative.png",
-            roborazziOptions = DefaultRoborazziOptions,
-        )
     }
 
     @Test
     fun `redacted card - match hidden`() {
-        composeTestRule.setContent {
-            LittleBirdTheme {
-                RedactedCard(
-                    item = newsItem(
-                        tier = Tier.TIER_1_RELIABLE,
-                        category = Category.MATCH,
-                        isMatch = true,
-                        source = "BBC Sport",
-                        title = "Match result hidden",
-                        summary = "Match content redacted.",
-                    ),
-                    onClick = {},
-                )
-            }
+        composeTestRule.captureThemed("FeedComponentsScreenshotTest_redacted_card_match_hidden.png") {
+            RedactedCard(
+                item = newsItem(
+                    tier = Tier.TIER_2_BEAT,
+                    category = Category.MATCH,
+                    isMatch = true,
+                    source = "BBC Sport",
+                    title = "Match result hidden",
+                    summary = "Match content redacted.",
+                ),
+                onClick = {},
+            )
         }
-        composeTestRule.onRoot().captureRoboImage(
-            filePath = "FeedComponentsScreenshotTest_redacted_card_match_hidden.png",
-            roborazziOptions = DefaultRoborazziOptions,
-        )
     }
 
     @Test
     fun `catch up card - three held`() {
-        composeTestRule.setContent {
-            LittleBirdTheme {
-                CatchUpCard(
-                    count = 3,
-                    onMarkWatched = {},
-                )
-            }
+        composeTestRule.captureThemed("FeedComponentsScreenshotTest_catch_up_card_three_held.png") {
+            CatchUpCard(count = 3, onMarkWatched = {})
         }
-        composeTestRule.onRoot().captureRoboImage(
-            filePath = "FeedComponentsScreenshotTest_catch_up_card_three_held.png",
-            roborazziOptions = DefaultRoborazziOptions,
-        )
     }
 
     @Test
     fun `protection banner - on`() {
-        composeTestRule.setContent {
-            LittleBirdTheme {
-                ProtectionBanner(
-                    on = true,
-                    onToggle = {},
-                )
-            }
+        composeTestRule.captureThemed("FeedComponentsScreenshotTest_protection_banner_on.png") {
+            ProtectionBanner(on = true, onToggle = {})
         }
-        composeTestRule.onRoot().captureRoboImage(
-            filePath = "FeedComponentsScreenshotTest_protection_banner_on.png",
-            roborazziOptions = DefaultRoborazziOptions,
-        )
     }
 
     @Test
     fun `protection banner - off`() {
-        composeTestRule.setContent {
-            LittleBirdTheme {
-                ProtectionBanner(
-                    on = false,
-                    onToggle = {},
-                )
-            }
+        composeTestRule.captureThemed("FeedComponentsScreenshotTest_protection_banner_off.png") {
+            ProtectionBanner(on = false, onToggle = {})
         }
-        composeTestRule.onRoot().captureRoboImage(
-            filePath = "FeedComponentsScreenshotTest_protection_banner_off.png",
-            roborazziOptions = DefaultRoborazziOptions,
-        )
     }
 }
 
@@ -215,48 +182,19 @@ class FeedComponentsTabletScreenshotTest {
 
     @Test
     fun `news card tablet - tier1 reliable confirmed`() {
-        composeTestRule.setContent {
-            LittleBirdTheme {
-                NewsCard(
-                    item = NewsItem(
-                        id = "tablet-test",
-                        source = "FabrizioRomano",
-                        tier = Tier.TIER_1_RELIABLE,
-                        category = Category.TRANSFER,
-                        isMatch = false,
-                        confirmed = true,
-                        author = null,
-                        role = null,
-                        title = "Arsenal agree £65m fee for top target",
-                        summary = "Exclusive: deal imminent, medical scheduled this week.",
-                        link = "https://example.com/news/1",
-                        imageUrl = null,
-                        publishedAt = Instant.parse("2026-06-01T10:00:00Z"),
-                    ),
-                    relativeTime = "2h ago",
-                    onClick = {},
-                )
-            }
+        composeTestRule.captureThemed("FeedComponentsTabletScreenshotTest_news_card_tablet_tier1_reliable_confirmed.png") {
+            NewsCard(
+                item = newsItem(tier = Tier.TIER_1_RELIABLE, category = Category.TRANSFER, confirmed = true),
+                relativeTime = "2h ago",
+                onClick = {},
+            )
         }
-        composeTestRule.onRoot().captureRoboImage(
-            filePath = "FeedComponentsTabletScreenshotTest_news_card_tablet_tier1_reliable_confirmed.png",
-            roborazziOptions = DefaultRoborazziOptions,
-        )
     }
 
     @Test
     fun `protection banner tablet - on`() {
-        composeTestRule.setContent {
-            LittleBirdTheme {
-                ProtectionBanner(
-                    on = true,
-                    onToggle = {},
-                )
-            }
+        composeTestRule.captureThemed("FeedComponentsTabletScreenshotTest_protection_banner_tablet_on.png") {
+            ProtectionBanner(on = true, onToggle = {})
         }
-        composeTestRule.onRoot().captureRoboImage(
-            filePath = "FeedComponentsTabletScreenshotTest_protection_banner_tablet_on.png",
-            roborazziOptions = DefaultRoborazziOptions,
-        )
     }
 }
