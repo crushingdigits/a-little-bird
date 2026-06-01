@@ -35,7 +35,7 @@ class MatchClassifierTest {
     )
 
     @Test
-    fun `flags all match headlines (100% recall)`() {
+    fun `flags all match headlines - 100 percent recall`() {
         val leaks = matchHeadlines.filterNot { subject.isMatch(it) }
         assertThat(leaks).isEmpty()
     }
@@ -56,5 +56,14 @@ class MatchClassifierTest {
     fun `bare token v and ft only match on word boundaries`() {
         assertThat(subject.isMatch("Liverpool v Everton")).isTrue()
         assertThat(subject.isMatch("Transfer of the season")).isFalse() // 'ft' inside 'transfer' must not match
+    }
+
+    @Test
+    fun `a non-match override cancels a weak signal hit but never a scoreline`() {
+        val classifier = MatchClassifier(defaultClassifierConfig.copy(nonMatchOverrides = listOf("transfer saga")))
+        // "win" is a match signal, but the transfer-context override cancels the weak hit.
+        assertThat(classifier.isMatch("Liverpool win bidding war in transfer saga")).isFalse()
+        // A scoreline is unconditional — an override never cancels it.
+        assertThat(classifier.isMatch("Transfer saga rumbles on after 2-0 result")).isTrue()
     }
 }

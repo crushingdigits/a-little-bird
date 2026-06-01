@@ -9,14 +9,16 @@ class MatchClassifier(private val config: ClassifierConfig) {
         Regex(prefix + escaped + suffix)
     }
 
-    private val allowlistRegexes: List<Regex> = config.transferContextAllowlist.map { Regex(Regex.escape(it)) }
+    private val overrideRegexes: List<Regex> = config.nonMatchOverrides.map { Regex(Regex.escape(it)) }
 
     /** @param text raw title + " " + description; normalized internally. */
     fun isMatch(text: String): Boolean {
         val t = TextNormalizer.normalize(text)
+        // A scoreline is an unconditional match — never suppressed.
         if (config.scorelineRegex.containsMatchIn(t)) return true
         val hit = signalRegexes.any { it.containsMatchIn(t) }
         if (!hit) return false
-        return allowlistRegexes.none { it.containsMatchIn(t) }
+        // A weak signal hit can be cancelled by a transfer-context override (default: none).
+        return overrideRegexes.none { it.containsMatchIn(t) }
     }
 }
