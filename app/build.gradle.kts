@@ -33,6 +33,11 @@ android {
     testOptions { unitTests.isIncludeAndroidResources = true }
 }
 
+roborazzi {
+    // Place golden PNGs in src/test/screenshots so they are tracked in version control.
+    outputDir.set(file("src/test/screenshots"))
+}
+
 kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17

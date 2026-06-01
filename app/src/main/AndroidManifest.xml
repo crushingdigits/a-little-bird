@@ -25,6 +25,11 @@
             </intent-filter>
         </activity>
 
+        <!-- Required by createComposeRule / createAndroidComposeRule under Robolectric -->
+        <activity
+            android:name="androidx.activity.ComponentActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>
