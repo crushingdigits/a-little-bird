@@ -1,0 +1,47 @@
+package dev.crushingdigits.littlebird.data.preferences
+
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import com.google.common.truth.Truth.assertThat
+import dev.crushingdigits.littlebird.data.preferences.datasource.PreferencesDataSource
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.rules.TemporaryFolder
+
+class PreferencesRepositoryTest {
+    @get:Rule val tmp = TemporaryFolder()
+    private lateinit var subject: PreferencesRepositoryImpl
+
+    @Before fun setUp() {
+        val dataStore: DataStore<Preferences> =
+            PreferenceDataStoreFactory.create(produceFile = { tmp.newFile("prefs.preferences_pb") })
+        subject = PreferencesRepositoryImpl(PreferencesDataSource(dataStore))
+    }
+
+    @Test fun `protection defaults on and toggles`() = runTest {
+        assertThat(subject.observeProtection().first()).isTrue()
+        subject.toggleProtection()
+        assertThat(subject.observeProtection().first()).isFalse()
+    }
+
+    @Test fun `reveal adds id and revealAll adds many`() = runTest {
+        subject.reveal("a")
+        subject.revealAll(setOf("b", "c"))
+        assertThat(subject.observeRevealed().first()).containsExactly("a", "b", "c")
+    }
+
+    @Test fun `restoreRevealed replaces the whole set`() = runTest {
+        subject.revealAll(setOf("a", "b"))
+        subject.restoreRevealed(setOf("only"))
+        assertThat(subject.observeRevealed().first()).containsExactly("only")
+    }
+
+    @Test fun `setProtection sets explicit value`() = runTest {
+        subject.setProtection(false)
+        assertThat(subject.observeProtection().first()).isFalse()
+    }
+}
