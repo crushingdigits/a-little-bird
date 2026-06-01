@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A Little Bird</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&family=Spline+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="app.css?v=3" />
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #100d14; }
+  #root { height: 100%; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="android-frame.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="icons.jsx"></script>
+<script type="text/babel" src="data.jsx"></script>
+<script type="text/babel" src="ui.jsx"></script>
+<script type="text/babel" src="screens.jsx"></script>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accent": "#ff4d5e",
+  "display": "Spline Sans",
+  "corners": "Rounded"
+}/*EDITMODE-END*/;
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+  const [tab, setTab] = useState("feed");
+  const [showAlerts, setShowAlerts] = useState(false);
+  const [protectionOn, setProt] = useState(true);
+  const [revealed, setRevealed] = useState([]);
+  const [detailItem, setDetail] = useState(null);
+  const [gateItem, setGate] = useState(null);
+  const [catchUp, setCatchUp] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  // spoiler settings
+  const [types, setTypes] = useState({ scores: true, live: true, ratings: true, reports: true, previews: true, lineups: false });
+  const [handling, setHandling] = useState("blur");
+  const [autoWindow, setAutoWindow] = useState(true);
+  // alerts
+  const [cats, setCats] = useState({ confirmed: true, rumours: true, coaching: true, contracts: false });
+  const [ntier, setNtier] = useState("t12");
+  const [quiet, setQuiet] = useState(true);
+
+  // fit device to viewport
+  const [scale, setScale] = useState(1);
+  useEffect(() => {
+    const fit = () => setScale(Math.min((window.innerWidth - 28) / 428, (window.innerHeight - 28) / 908, 1));
+    fit(); window.addEventListener("resize", fit); return () => window.removeEventListener("resize", fit);
+  }, []);
+
+  const showToast = (msg, action = null) => { setToast({ msg, action }); clearTimeout(window.__tt); window.__tt = setTimeout(() => setToast(null), 2600); };
+  const openItem = (item) => {
+    if (protectionOn && item.match && !revealed.includes(item.id)) setGate(item);
+    else setDetail(item);
+  };
+  const reveal = () => {
+    if (!gateItem) return;
+    const it = gateItem;
+    setRevealed((r) => [...r, it.id]);
+    setGate(null);
+    setTimeout(() => setDetail(it), 80);
+  };
+  const markWatched = () => {
+    const heldIds = FEED.filter((i) => i.match && !revealed.includes(i.id)).map((i) => i.id);
+    const prev = revealed;
+    setRevealed((r) => Array.from(new Set([...r, ...heldIds])));
+    setCatchUp(false);
+    showToast(heldIds.length + " match update" + (heldIds.length > 1 ? "s" : "") + " unlocked",
+      { label: "Undo", onClick: () => { setRevealed(prev); setToast(null); } });
+  };
+
+  const radius = t.corners === "Sharp" ? "12px" : "22px";
+  const rootStyle = {
+    transform: "scale(" + scale + ")",
+    "--primary": t.accent,
+    "--f-display": "'" + t.display + "', system-ui, sans-serif",
+    "--r-card": radius,
+  };
+
+  return (
+    <React.Fragment>
+      <div className="stage">
+        <div className="stage-inner" style={rootStyle}>
+          <AndroidDevice dark width={412} height={892}>
+            <div className="app">
+              <TopBar protectionOn={protectionOn} onToggleShield={() => setProt((p) => !p)} />
+
+              {tab === "feed" && (
+                <FeedScreen protectionOn={protectionOn} onToggleProtection={() => setProt((p) => !p)}
+                  revealed={revealed} onOpen={openItem} onCatchUp={() => setCatchUp(true)} />
+              )}
+              {tab === "settings" && (
+                <SettingsScreen protectionOn={protectionOn} onToggleProtection={() => setProt((p) => !p)}
+                  types={types} toggleType={(k) => setTypes((s) => ({ ...s, [k]: !s[k] }))}
+                  handling={handling} setHandling={setHandling}
+                  autoWindow={autoWindow} setAutoWindow={setAutoWindow}
+                  onOpenAlerts={() => setShowAlerts(true)} />
+              )}
+
+              <BottomNav tab={tab} onTab={setTab} />
+
+              {showAlerts && (
+                <AlertsSubscreen onClose={() => setShowAlerts(false)}
+                  cats={cats} toggleCat={(k) => setCats((s) => ({ ...s, [k]: !s[k] }))}
+                  tier={ntier} setTier={setNtier} quiet={quiet} setQuiet={setQuiet} />
+              )}
+
+              {detailItem && <DetailScreen item={detailItem} onClose={() => setDetail(null)} onToast={showToast} />}
+              {gateItem && <GateSheet item={gateItem} onReveal={reveal} onCancel={() => setGate(null)} />}
+              {catchUp && <CatchUpSheet count={FEED.filter((i) => i.match && !revealed.includes(i.id)).length} onConfirm={markWatched} onCancel={() => setCatchUp(false)} />}
+              {toast && <Toast key={toast.msg} msg={toast.msg} action={toast.action} />}
+            </div>
+          </AndroidDevice>
+        </div>
+      </div>
+
+      <TweaksPanel>
+        <TweakSection label="Brand" />
+        <TweakColor label="Accent" value={t.accent}
+          options={["#ff4d5e", "#ff3b54", "#ff6a4d"]}
+          onChange={(v) => setTweak("accent", v)} />
+        <TweakRadio label="Display font" value={t.display}
+          options={["Archivo", "Sora", "Spline Sans"]}
+          onChange={(v) => setTweak("display", v)} />
+        <TweakRadio label="Corners" value={t.corners}
+          options={["Rounded", "Sharp"]}
+          onChange={(v) => setTweak("corners", v)} />
+      </TweaksPanel>
+    </React.Fragment>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
