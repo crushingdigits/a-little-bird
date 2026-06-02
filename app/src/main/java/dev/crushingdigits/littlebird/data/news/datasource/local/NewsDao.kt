@@ -11,6 +11,9 @@ interface NewsDao {
     @Query("SELECT * FROM news_items ORDER BY publishedAtEpochMs DESC")
     fun observeAll(): Flow<List<NewsItemEntity>>
 
+    @Query("SELECT * FROM news_items WHERE id = :id LIMIT 1")
+    fun observeById(id: String): Flow<NewsItemEntity?>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertAll(items: List<NewsItemEntity>)
 

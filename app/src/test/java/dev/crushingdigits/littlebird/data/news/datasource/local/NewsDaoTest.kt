@@ -39,4 +39,17 @@ class NewsDaoTest {
         }
         assertThat(dao.count()).isEqualTo(2)
     }
+
+    @Test fun `observeById emits the matching row then null for an unknown id`() = runTest {
+        dao.upsertAll(listOf(entity("x1", at = 100)))
+
+        dao.observeById("x1").test {
+            assertThat(awaitItem()?.id).isEqualTo("x1")
+            cancelAndIgnoreRemainingEvents()
+        }
+        dao.observeById("missing").test {
+            assertThat(awaitItem()).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }
