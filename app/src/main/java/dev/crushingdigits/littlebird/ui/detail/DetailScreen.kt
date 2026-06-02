@@ -57,7 +57,7 @@ fun DetailScreen(viewModel: DetailViewModel, onBack: () -> Unit, modifier: Modif
             onShare = { shareItem(context, item) },
             modifier = modifier,
         )
-        // Pre-emission snapshot: item not yet resolved (keys off item==null, not the vestigial isLoading flag).
+        // Pre-emission snapshot: item not yet resolved (item == null, not yet notFound).
         else -> DetailMessage("Loading…", "", onBack, modifier)
     }
 }

@@ -31,7 +31,6 @@ class DetailViewModelTest {
         sut.uiState.test {
             val s = awaitItem()
             assertThat(s.item?.id).isEqualTo("a")
-            assertThat(s.isLoading).isFalse()
             assertThat(s.notFound).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
@@ -43,7 +42,6 @@ class DetailViewModelTest {
             val s = awaitItem()
             assertThat(s.item).isNull()
             assertThat(s.notFound).isTrue()
-            assertThat(s.isLoading).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
     }

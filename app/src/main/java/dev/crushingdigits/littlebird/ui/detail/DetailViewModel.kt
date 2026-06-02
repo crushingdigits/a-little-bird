@@ -21,8 +21,8 @@ class DetailViewModel @AssistedInject constructor(
 
     val uiState: StateFlow<DetailUiState> = observeNewsItem(key.itemId)
         .map { item ->
-            if (item == null) DetailUiState(item = null, isLoading = false, notFound = true)
-            else DetailUiState(item = item, isLoading = false, notFound = false)
+            if (item == null) DetailUiState(notFound = true)
+            else DetailUiState(item = item)
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), DetailUiState())
 
