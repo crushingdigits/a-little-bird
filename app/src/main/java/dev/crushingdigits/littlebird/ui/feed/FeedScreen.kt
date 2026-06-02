@@ -40,7 +40,11 @@ import dev.crushingdigits.littlebird.ui.util.relativeTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FeedScreen(modifier: Modifier = Modifier, viewModel: FeedViewModel = hiltViewModel()) {
+fun FeedScreen(
+    modifier: Modifier = Modifier,
+    onNavigateToDetail: (String) -> Unit = {},
+    viewModel: FeedViewModel = hiltViewModel(),
+) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -58,7 +62,7 @@ fun FeedScreen(modifier: Modifier = Modifier, viewModel: FeedViewModel = hiltVie
                         viewModel.onUndo(action.undoSnapshot)
                     }
                 }
-                is FeedAction.NavigateToDetail -> Unit // wired in Task 11 (nav host)
+                is FeedAction.NavigateToDetail -> onNavigateToDetail(action.itemId)
             }
         }
     }
