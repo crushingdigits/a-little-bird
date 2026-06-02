@@ -36,8 +36,7 @@ import dev.crushingdigits.littlebird.ui.components.NewsCard
 import dev.crushingdigits.littlebird.ui.components.ProtectionBanner
 import dev.crushingdigits.littlebird.ui.components.RedactedCard
 import dev.crushingdigits.littlebird.ui.components.TopBar
-import java.time.Duration
-import java.time.Instant
+import dev.crushingdigits.littlebird.ui.util.relativeTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -167,12 +166,3 @@ private fun EmptyState(title: String, subtitle: String) {
     }
 }
 
-private fun NewsItem.relativeTime(now: Instant = Instant.now()): String {
-    val mins = Duration.between(publishedAt, now).toMinutes().coerceAtLeast(0)
-    return when {
-        mins < 1 -> "now"
-        mins < 60 -> "${mins}m"
-        mins < 1440 -> "${mins / 60}h"
-        else -> "${mins / 1440}d"
-    }
-}
