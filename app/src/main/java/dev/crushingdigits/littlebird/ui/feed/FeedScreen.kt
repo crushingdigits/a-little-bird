@@ -58,6 +58,7 @@ fun FeedScreen(modifier: Modifier = Modifier, viewModel: FeedViewModel = hiltVie
                         viewModel.onUndo(action.undoSnapshot)
                     }
                 }
+                is FeedAction.NavigateToDetail -> Unit // wired in Task 11 (nav host)
             }
         }
     }

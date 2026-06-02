@@ -110,4 +110,33 @@ class FeedViewModelTest {
         }
         assertThat(prefs.revealed.value).containsExactly("m1", "m2")
     }
+
+    @Test fun `clicking a normal card emits NavigateToDetail`() = runTest {
+        val sut = vm(FakeNews(listOf(item("t", false))), FakePrefs(on = false))
+        sut.actions.test {
+            sut.onCardClick(FeedCard.Normal(item("t", false)))
+            assertThat(awaitItem()).isEqualTo(FeedAction.NavigateToDetail("t"))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `clicking a redacted card opens the gate and does not navigate`() = runTest {
+        val sut = vm(FakeNews(listOf(item("m", true))), FakePrefs(on = true))
+        sut.onCardClick(FeedCard.Redacted(item("m", true)))
+        sut.uiState.test {
+            assertThat(awaitItem().gateTarget?.id).isEqualTo("m")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `revealing from the gate navigates to detail`() = runTest {
+        val prefs = FakePrefs(on = true)
+        val sut = vm(FakeNews(listOf(item("m", true))), prefs)
+        sut.actions.test {
+            sut.onRevealFromGate("m")
+            assertThat(awaitItem()).isEqualTo(FeedAction.NavigateToDetail("m"))
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertThat(prefs.revealed.value).contains("m")
+    }
 }

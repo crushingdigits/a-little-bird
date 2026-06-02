@@ -67,9 +67,24 @@ class FeedViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FeedUiState())
 
     fun onToggleProtection() = viewModelScope.launch { toggleProtection() }
-    fun onCardClick(card: FeedCard) { if (card is FeedCard.Redacted) gateTarget.value = card.item }
+    fun onCardClick(card: FeedCard) {
+        when (card) {
+            is FeedCard.Redacted -> gateTarget.value = card.item
+            is FeedCard.Normal -> navigateToDetail(card.item.id)
+        }
+    }
+
     fun onDismissGate() { gateTarget.value = null }
-    fun onRevealFromGate(id: String) = viewModelScope.launch { revealItem(id); gateTarget.value = null }
+
+    fun onRevealFromGate(id: String) = viewModelScope.launch {
+        revealItem(id)
+        gateTarget.value = null
+        _actions.emit(FeedAction.NavigateToDetail(id))
+    }
+
+    private fun navigateToDetail(id: String) = viewModelScope.launch {
+        _actions.emit(FeedAction.NavigateToDetail(id))
+    }
     fun onRequestCatchUp() { catchUpVisible.value = true }
     fun onDismissCatchUp() { catchUpVisible.value = false }
 
