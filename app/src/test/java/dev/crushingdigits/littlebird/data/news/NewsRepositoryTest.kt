@@ -87,4 +87,13 @@ class NewsRepositoryTest {
         assertThat(subject.observeFeed().first()).hasSize(1)
         assertThat(subject.isEmpty()).isFalse()
     }
+
+    @Test fun `observeItem maps the stored row to domain and emits null for a missing id`() = runTest {
+        val subject = repo(FakeFetcher(mapOf(source.url to Result.success(rss("Deal agreed for midfielder", "Here we go")))))
+        subject.refresh()
+        val id = subject.observeFeed().first().single().id
+
+        assertThat(subject.observeItem(id).first()?.id).isEqualTo(id)
+        assertThat(subject.observeItem("does-not-exist").first()).isNull()
+    }
 }

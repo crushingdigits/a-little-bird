@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.map
 
 interface NewsRepository {
     fun observeFeed(): Flow<List<NewsItem>>
+    fun observeItem(id: String): Flow<NewsItem?>
     suspend fun refresh(): Result<Unit>
     suspend fun isEmpty(): Boolean
 }
@@ -28,6 +29,9 @@ class NewsRepositoryImpl(
 
     override fun observeFeed(): Flow<List<NewsItem>> =
         local.observeAll().map { rows -> rows.map { it.toDomain() } }
+
+    override fun observeItem(id: String): Flow<NewsItem?> =
+        local.observeById(id).map { entity -> entity?.toDomain() }
 
     override suspend fun refresh(): Result<Unit> = runCatching {
         val raw = remote.fetchAll(sources)

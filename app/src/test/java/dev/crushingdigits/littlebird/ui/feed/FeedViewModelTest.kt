@@ -18,6 +18,7 @@ import dev.crushingdigits.littlebird.domain.usecase.RevealItemUseCase
 import dev.crushingdigits.littlebird.domain.usecase.ToggleProtectionUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -35,6 +36,7 @@ class FeedViewModelTest {
     private class FakeNews(items: List<NewsItem>) : NewsRepository {
         val flow = MutableStateFlow(items)
         override fun observeFeed(): Flow<List<NewsItem>> = flow
+        override fun observeItem(id: String): Flow<NewsItem?> = flow.map { items -> items.firstOrNull { it.id == id } }
         override suspend fun refresh(): Result<Unit> = Result.success(Unit)
         override suspend fun isEmpty(): Boolean = flow.value.isEmpty()
     }
