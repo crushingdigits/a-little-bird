@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Debug-only overlay. Robolectric (createComposeRule) needs a registered host Activity;
+  androidx.activity.ComponentActivity is declared here so it is merged into the debug
+  build for screenshot tests, but never ships in the release manifest.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <activity
+            android:name="androidx.activity.ComponentActivity"
+            android:exported="false" />
+    </application>
+</manifest>
