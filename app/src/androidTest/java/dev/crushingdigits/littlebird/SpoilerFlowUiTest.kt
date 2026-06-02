@@ -96,4 +96,37 @@ class SpoilerFlowUiTest {
             textAsString()?.contains("match updates unlocked") == true
         }
     }
+
+    /** Tapping a non-match (Normal) card opens the Detail reader; device-back returns to the feed. */
+    @Test
+    fun tapping_a_normal_card_opens_the_detail_reader() = uiAutomator {
+        startActivity(MainActivity::class.java)
+
+        val transferCard = onElement(timeoutMs = 10_000L) {
+            textAsString() == "Liverpool agree £65m deal for midfielder"
+        }
+        transferCard.click()
+
+        // Reader shows the primary "Open original" button.
+        onElement(timeoutMs = 5_000L) { textAsString() == "Open original" }
+
+        pressBack()
+
+        // Back on the feed.
+        onElement(timeoutMs = 5_000L) { textAsString()?.contains("Spoiler protection") == true }
+    }
+
+    /** Revealing a match card through the gate opens the reader for that item. */
+    @Test
+    fun revealing_a_match_card_opens_the_detail_reader() = uiAutomator {
+        startActivity(MainActivity::class.java)
+
+        onElement(timeoutMs = 10_000L) { textAsString() == "Match content hidden" }.click()
+        onElement(timeoutMs = 5_000L) { textAsString() == "This one might spoil you" }
+        onElement(timeoutMs = 5_000L) { textAsString() == "Reveal anyway" }.click()
+
+        // After reveal the reader opens — assert its "Open original" button (do NOT click it,
+        // to avoid launching an external browser out of the app).
+        onElement(timeoutMs = 5_000L) { textAsString() == "Open original" }
+    }
 }
