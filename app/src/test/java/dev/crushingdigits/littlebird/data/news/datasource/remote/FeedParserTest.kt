@@ -33,4 +33,26 @@ class FeedParserTest {
         assertThat(items[0].link).isEqualTo("https://example.com/c")
         assertThat(items[0].author).isEqualTo("BBC Sport")
     }
+
+    @Test fun `parses BBC fixture incl media-thumbnail image and isPermaLink guid`() {
+        val items = subject.parse(fixture("source_bbc_liverpool.xml"), sourceId = "bbc_liverpool")
+
+        assertThat(items).hasSize(2)
+        val first = items[0]
+        assertThat(first.title).isEqualTo("Mohamed Salah - Egyptian king")
+        assertThat(first.guid).isEqualTo("https://www.bbc.com/sport/football/articles/cx2xlk74llno#0")
+        assertThat(first.pubDate).isEqualTo("Wed, 03 Jun 2026 06:26:52 GMT")
+        assertThat(first.imageUrl)
+            .isEqualTo("https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/fa1c/live/salah.jpg")
+    }
+
+    @Test fun `parses Echo fixture, larger media-content image wins over thumbnail`() {
+        val items = subject.parse(fixture("source_liverpool_echo.xml"), sourceId = "liverpool_echo")
+
+        assertThat(items).hasSize(2)
+        val first = items[0]
+        assertThat(first.author).isEqualTo("Matt Addison")
+        assertThat(first.pubDate).isEqualTo("Wed, 3 Jun 2026 08:15:56 +0000")
+        assertThat(first.imageUrl).contains("/ALTERNATES/s615/") // media:content (615) overwrites the 98px thumbnail
+    }
 }

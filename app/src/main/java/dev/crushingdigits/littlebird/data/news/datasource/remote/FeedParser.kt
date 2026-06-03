@@ -41,7 +41,7 @@ class FeedParser {
                         if (inItem && current != null) {
                             current["author"] = readAuthor(parser)
                         }
-                    "media:content", "enclosure" ->
+                    "media:content", "media:thumbnail", "enclosure" ->
                         if (inItem && current != null) {
                             parser.getAttributeValue(null, "url")?.let { current["image"] = it }
                         }
