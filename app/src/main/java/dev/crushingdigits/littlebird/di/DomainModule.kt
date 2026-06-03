@@ -8,6 +8,8 @@ import dev.crushingdigits.littlebird.domain.usecase.MarkWatched
 import dev.crushingdigits.littlebird.domain.usecase.MarkWatchedUseCase
 import dev.crushingdigits.littlebird.domain.usecase.ObserveFeed
 import dev.crushingdigits.littlebird.domain.usecase.ObserveFeedUseCase
+import dev.crushingdigits.littlebird.domain.usecase.ObserveNewsItem
+import dev.crushingdigits.littlebird.domain.usecase.ObserveNewsItemUseCase
 import dev.crushingdigits.littlebird.domain.usecase.ObserveProtection
 import dev.crushingdigits.littlebird.domain.usecase.ObserveProtectionUseCase
 import dev.crushingdigits.littlebird.domain.usecase.ObserveRevealed
@@ -34,4 +36,5 @@ abstract class DomainModule {
     @Binds abstract fun revealItem(impl: RevealItemUseCase): RevealItem
     @Binds abstract fun markWatched(impl: MarkWatchedUseCase): MarkWatched
     @Binds abstract fun restoreRevealed(impl: RestoreRevealedUseCase): RestoreRevealed
+    @Binds abstract fun observeNewsItem(impl: ObserveNewsItemUseCase): ObserveNewsItem
 }

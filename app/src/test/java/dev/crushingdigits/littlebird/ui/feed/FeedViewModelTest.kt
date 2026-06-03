@@ -18,6 +18,7 @@ import dev.crushingdigits.littlebird.domain.usecase.RevealItemUseCase
 import dev.crushingdigits.littlebird.domain.usecase.ToggleProtectionUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -35,6 +36,7 @@ class FeedViewModelTest {
     private class FakeNews(items: List<NewsItem>) : NewsRepository {
         val flow = MutableStateFlow(items)
         override fun observeFeed(): Flow<List<NewsItem>> = flow
+        override fun observeItem(id: String): Flow<NewsItem?> = flow.map { items -> items.firstOrNull { it.id == id } }
         override suspend fun refresh(): Result<Unit> = Result.success(Unit)
         override suspend fun isEmpty(): Boolean = flow.value.isEmpty()
     }
@@ -107,5 +109,34 @@ class FeedViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
         assertThat(prefs.revealed.value).containsExactly("m1", "m2")
+    }
+
+    @Test fun `clicking a normal card emits NavigateToDetail`() = runTest {
+        val sut = vm(FakeNews(listOf(item("t", false))), FakePrefs(on = false))
+        sut.actions.test {
+            sut.onCardClick(FeedCard.Normal(item("t", false)))
+            assertThat(awaitItem()).isEqualTo(FeedAction.NavigateToDetail("t"))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `clicking a redacted card opens the gate and does not navigate`() = runTest {
+        val sut = vm(FakeNews(listOf(item("m", true))), FakePrefs(on = true))
+        sut.onCardClick(FeedCard.Redacted(item("m", true)))
+        sut.uiState.test {
+            assertThat(awaitItem().gateTarget?.id).isEqualTo("m")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `revealing from the gate navigates to detail`() = runTest {
+        val prefs = FakePrefs(on = true)
+        val sut = vm(FakeNews(listOf(item("m", true))), prefs)
+        sut.actions.test {
+            sut.onRevealFromGate("m")
+            assertThat(awaitItem()).isEqualTo(FeedAction.NavigateToDetail("m"))
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertThat(prefs.revealed.value).contains("m")
     }
 }

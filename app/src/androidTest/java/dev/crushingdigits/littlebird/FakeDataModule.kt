@@ -12,6 +12,7 @@ import dev.crushingdigits.littlebird.domain.model.NewsItem
 import dev.crushingdigits.littlebird.domain.model.Tier
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import java.time.Instant
 import javax.inject.Singleton
 
@@ -52,6 +53,7 @@ class FakeNewsRepository : NewsRepository {
     )
 
     override fun observeFeed(): Flow<List<NewsItem>> = items
+    override fun observeItem(id: String): Flow<NewsItem?> = items.map { list -> list.firstOrNull { it.id == id } }
     override suspend fun refresh(): Result<Unit> = Result.success(Unit)
     override suspend fun isEmpty(): Boolean = false
 }
