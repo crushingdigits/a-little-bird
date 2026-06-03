@@ -22,4 +22,10 @@ class FeedSourcesTest {
         assertThat(guardian.defaultTier).isEqualTo(Tier.TIER_1_RELIABLE)
         assertThat(guardian.clubScoped).isTrue()
     }
+
+    @Test fun `david lynch is a club-scoped tier-2 beat source`() {
+        val lynch = source("david_lynch")
+        assertThat(lynch.defaultTier).isEqualTo(Tier.TIER_2_BEAT)
+        assertThat(lynch.clubScoped).isTrue()
+    }
 }

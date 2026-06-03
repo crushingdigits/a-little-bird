@@ -32,5 +32,11 @@ object FeedSources {
             url = "https://www.theguardian.com/football/liverpool/rss",
             defaultTier = Tier.TIER_1_RELIABLE,
         ),
+        FeedSource(
+            id = "david_lynch",
+            name = "David Lynch",
+            url = "https://www.davidlynchlfc.co.uk/feed",
+            defaultTier = Tier.TIER_2_BEAT,
+        ),
     )
 }
