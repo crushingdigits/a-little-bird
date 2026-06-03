@@ -25,10 +25,11 @@ import kotlinx.datetime.format.optional
  * - **ISO-8601** (Atom): `2026-06-01T07:00:00Z` and `2026-06-01T07:00:00+02:00`.
  *
  * ## Recognised zone abbreviations (the ceiling — anything else falls through to `0L`)
- * `GMT`/`UTC`/`UT`/`Z` → `+0000`, `BST` → `+0100`, `EST` → `-0500`, `EDT` → `-0400`,
- * `CST` → `-0600`, `CDT` → `-0500`, `MST` → `-0700`, `MDT` → `-0600`, `PST` → `-0800`,
- * `PDT` → `-0700`. An abbreviation that is not in this map is left untouched, so parsing fails and
- * the result is `0L` — there is no silent guessing. `null`/blank input is also `0L`.
+ * `GMT`/`UTC`/`UT`/`Z` → `+0000`, `BST`/`CET` → `+0100`, `CEST` → `+0200`,
+ * `EST` → `-0500`, `EDT` → `-0400`, `CST` → `-0600`, `CDT` → `-0500`, `MST` → `-0700`,
+ * `MDT` → `-0600`, `PST` → `-0800`, `PDT` → `-0700`. An abbreviation that is not in this map is
+ * left untouched, so parsing fails and the result is `0L` — there is no silent guessing.
+ * `null`/blank input is also `0L`.
  */
 internal fun parseFeedDate(raw: String?): Long {
     val trimmed = raw?.trim()?.takeIf { it.isNotEmpty() } ?: return 0L
@@ -39,16 +40,17 @@ internal fun parseFeedDate(raw: String?): Long {
         ?: 0L
 }
 
-/** Strip the leading weekday token, then rewrite a trailing recognised zone abbreviation. */
+/** Strip the leading weekday token, collapse internal whitespace, then rewrite a trailing recognised zone abbreviation. */
 private fun normalize(value: String): String {
     val withoutWeekday = leadingWeekday.replaceFirst(value, "")
-    return trailingZone.replace(withoutWeekday) { match ->
+    val collapsed = withoutWeekday.replace(Regex("\\s+"), " ").trim()
+    return trailingZone.replace(collapsed) { match ->
         zoneOffsets[match.value.uppercase()] ?: match.value
     }
 }
 
 private val leadingWeekday = Regex("^[A-Za-z]{3,},?\\s*")
-private val trailingZone = Regex("\\b([A-Za-z]{1,3})$")
+private val trailingZone = Regex("\\b([A-Za-z]{1,4})$")
 
 /** Explicit, documented zone abbreviation → 4-digit numeric offset. No silent magic. */
 private val zoneOffsets: Map<String, String> = mapOf(
@@ -57,6 +59,8 @@ private val zoneOffsets: Map<String, String> = mapOf(
     "UT" to "+0000",
     "Z" to "+0000",
     "BST" to "+0100",
+    "CET" to "+0100",
+    "CEST" to "+0200",
     "EST" to "-0500",
     "EDT" to "-0400",
     "CST" to "-0600",

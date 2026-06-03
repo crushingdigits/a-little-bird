@@ -77,4 +77,29 @@ class FeedDateTest {
     @Test fun `null is zero`() {
         assertThat(parseFeedDate(null)).isEqualTo(0L)
     }
+
+    @Test fun `folded whitespace between tokens still parses`() {
+        assertThat(parseFeedDate("Wed,  3  Jun  2026  08:15:56  +0000"))
+            .isEqualTo(epochOf("2026-06-03T08:15:56Z"))
+    }
+
+    @Test fun `lowercase mixed-case named zone is uppercased before lookup`() {
+        assertThat(parseFeedDate("Mon, 1 Jun 2026 10:00:00 bst"))
+            .isEqualTo(epochOf("2026-06-01T09:00:00Z"))
+    }
+
+    @Test fun `seconds absent still parses`() {
+        assertThat(parseFeedDate("Mon, 1 Jun 2026 10:00 +0000"))
+            .isEqualTo(epochOf("2026-06-01T10:00:00Z"))
+    }
+
+    @Test fun `CET named zone maps to plus one hour`() {
+        assertThat(parseFeedDate("Mon, 1 Jun 2026 10:00:00 CET"))
+            .isEqualTo(epochOf("2026-06-01T09:00:00Z"))
+    }
+
+    @Test fun `CEST named zone maps to plus two hours`() {
+        assertThat(parseFeedDate("Tue, 2 Jun 2026 10:00:00 CEST"))
+            .isEqualTo(epochOf("2026-06-02T08:00:00Z"))
+    }
 }
