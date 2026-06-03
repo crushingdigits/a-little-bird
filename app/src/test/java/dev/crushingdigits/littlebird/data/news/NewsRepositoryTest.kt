@@ -4,6 +4,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import dev.crushingdigits.littlebird.data.news.classifier.Categoriser
+import dev.crushingdigits.littlebird.data.news.classifier.LiverpoolRelevanceFilter
 import dev.crushingdigits.littlebird.data.news.classifier.MatchClassifier
 import dev.crushingdigits.littlebird.data.news.classifier.NewsClassifier
 import dev.crushingdigits.littlebird.data.news.classifier.defaultClassifierConfig
@@ -56,8 +57,14 @@ class NewsRepositoryTest {
     }
     @After fun tearDown() = db.close()
 
-    private fun repo(fetcher: FeedFetcher) =
-        NewsRepositoryImpl(NewsRemoteDataSource(fetcher, FeedParser()), local, classifier, listOf(source))
+    private fun repo(fetcher: FeedFetcher, sources: List<FeedSource> = listOf(source)) =
+        NewsRepositoryImpl(
+            NewsRemoteDataSource(fetcher, FeedParser()),
+            local,
+            classifier,
+            sources,
+            LiverpoolRelevanceFilter(),
+        )
 
     @Test fun `refresh fetches, classifies, persists — observeFeed emits classified domain`() = runTest {
         val subject = repo(FakeFetcher(mapOf(source.url to Result.success(rss("Liverpool agree deal for midfielder", "Here we go")))))
@@ -95,5 +102,32 @@ class NewsRepositoryTest {
 
         assertThat(subject.observeItem(id).first()?.id).isEqualTo(id)
         assertThat(subject.observeItem("does-not-exist").first()).isNull()
+    }
+
+    @Test fun `non-club-scoped feed keeps only Liverpool items`() = runTest {
+        val romano = FeedSource(
+            id = "fabrizio_romano",
+            name = "Fabrizio Romano",
+            url = "https://x/romano-feed",
+            defaultTier = Tier.TIER_2_BEAT,
+            clubScoped = false,
+        )
+        val feed = """
+            <rss version="2.0"><channel>
+              <item><title>Arsenal eye Declan Rice</title><link>https://x/arsenal</link>
+                <dc:creator>Fabrizio Romano</dc:creator><description>Arteta wants a new deal</description>
+                <pubDate>Tue, 02 Jun 2026 20:56:47 GMT</pubDate></item>
+              <item><title>Liverpool push for a winger</title><link>https://x/lfc</link>
+                <dc:creator>Fabrizio Romano</dc:creator><description>Reds in talks</description>
+                <pubDate>Tue, 02 Jun 2026 21:56:47 GMT</pubDate></item>
+            </channel></rss>
+        """.trimIndent()
+        val subject = repo(FakeFetcher(mapOf(romano.url to Result.success(feed))), listOf(romano))
+
+        subject.refresh()
+
+        val items = subject.observeFeed().first()
+        assertThat(items).hasSize(1)
+        assertThat(items.single().title).isEqualTo("Liverpool push for a winger")
     }
 }

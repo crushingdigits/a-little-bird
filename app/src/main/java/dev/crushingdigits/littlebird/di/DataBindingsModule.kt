@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dev.crushingdigits.littlebird.data.news.NewsRepository
 import dev.crushingdigits.littlebird.data.news.NewsRepositoryImpl
+import dev.crushingdigits.littlebird.data.news.classifier.LiverpoolRelevanceFilter
 import dev.crushingdigits.littlebird.data.news.classifier.NewsClassifier
 import dev.crushingdigits.littlebird.data.news.datasource.local.NewsLocalDataSource
 import dev.crushingdigits.littlebird.data.news.datasource.remote.NewsRemoteDataSource
@@ -26,7 +27,8 @@ object DataBindingsModule {
         local: NewsLocalDataSource,
         classifier: NewsClassifier,
         sources: List<FeedSource>,
-    ): NewsRepository = NewsRepositoryImpl(remote, local, classifier, sources)
+        relevanceFilter: LiverpoolRelevanceFilter,
+    ): NewsRepository = NewsRepositoryImpl(remote, local, classifier, sources, relevanceFilter)
 
     @Provides
     @Singleton
