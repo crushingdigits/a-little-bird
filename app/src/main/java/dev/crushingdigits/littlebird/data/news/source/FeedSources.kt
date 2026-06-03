@@ -24,7 +24,7 @@ object FeedSources {
             id = "bbc_liverpool",
             name = "BBC Sport — Liverpool",
             url = "https://feeds.bbci.co.uk/sport/football/teams/liverpool/rss.xml",
-            defaultTier = Tier.TIER_2_BEAT,
+            defaultTier = Tier.TIER_1_RELIABLE,
         ),
     )
 }
