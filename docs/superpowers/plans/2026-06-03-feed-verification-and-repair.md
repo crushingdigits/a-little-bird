@@ -159,6 +159,8 @@ Expected: lists `source_this_is_anfield.xml`, `source_liverpool_echo.xml`, `sour
 
 ## Task 2: Broaden date parsing (single-digit days + zone names)
 
+> **Superseded by Task 6.** This task shipped a java.time `RFC_1123_DATE_TIME` fix. During execution it was replaced by a fully robust kotlinx-datetime parser (see Task 6) that also ignores the weekday and maps named zones — the final date engine.
+
 **Files:**
 - Test: `app/src/test/java/dev/crushingdigits/littlebird/data/news/mapper/NewsMappersTest.kt`
 - Modify: `app/src/main/java/dev/crushingdigits/littlebird/data/news/mapper/NewsMappers.kt`
@@ -466,6 +468,16 @@ Commit any remaining changes directly with `git` (descriptive message + `Co-Auth
 - [ ] **Step 6: ✅ Checkpoint.**
 
 ---
+
+## Task 6 (post-plan): Robust feed-date parsing via kotlinx-datetime
+
+Added during execution after review flagged the original `RFC_1123_DATE_TIME` fix (Task 2) still made two hidden assumptions — it validated the weekday and only understood `GMT`. The user chose to add **kotlinx-datetime** and build a genuinely robust parser.
+
+- **Dep:** kotlinx-datetime `0.7.1` (`[versions]`/`[libraries]` in `gradle/libs.versions.toml`, `implementation(libs.kotlinx.datetime)` in `app/build.gradle.kts`).
+- **New:** `app/src/main/java/dev/crushingdigits/littlebird/data/news/mapper/FeedDate.kt` — `internal fun parseFeedDate(raw: String?): Long`. Strips/ignores the weekday; explicit zone-abbreviation map (`GMT/UTC/UT/Z`, `BST`, `EST/EDT`, `CST/CDT`, `MST/MDT`, `PST/PDT`, `CET/CEST`); single-digit days, folded whitespace, optional seconds; RFC-822/1123 → ISO-8601 → `0L`. KDoc documents the explicit-assumptions contract.
+- **New:** `FeedDateTest.kt` — 18-row TDD matrix (named zones, wrong/missing weekday, folded whitespace, lowercase zones, absent seconds, numeric offsets, ISO, garbage→0L).
+- **Wired:** `NewsMappers.toEntity` calls `parseFeedDate(pubDate)`; the old private `parseDate` removed.
+- Commits: `dc7be60` (parser) + `3741b6e` (folded whitespace + CET/CEST). Full suite: 92 tests green.
 
 ## Self-review — spec coverage
 
