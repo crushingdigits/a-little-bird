@@ -15,12 +15,6 @@ object FeedSources {
             defaultTier = Tier.TIER_2_BEAT,
         ),
         FeedSource(
-            id = "tia_transfers",
-            name = "This Is Anfield — Transfers",
-            url = "https://www.thisisanfield.com/liverpool-fc-transfer-rumours/feed/",
-            defaultTier = Tier.TIER_2_BEAT,
-        ),
-        FeedSource(
             id = "liverpool_echo",
             name = "Liverpool Echo",
             url = "https://www.liverpool.com/all-about/liverpool-fc?service=rss",
