@@ -7,23 +7,11 @@ import dev.crushingdigits.littlebird.domain.model.Classification
 import dev.crushingdigits.littlebird.domain.model.NewsItem
 import dev.crushingdigits.littlebird.domain.model.Tier
 import java.time.Instant
-import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
 
 private val htmlTag = Regex("<[^>]+>")
 private val whitespace = Regex("\\s+")
 
 private fun String.stripHtml(): String = htmlTag.replace(this, "").replace(whitespace, " ").trim()
-
-/**
- * RFC-1123/822 (RSS pubDate) — tolerant of single-digit days (`3 Jun`) and zone names
- * (`GMT`) as well as numeric offsets (`+0000`) — then ISO-8601 (Atom). Unknown/blank → EPOCH.
- */
-private fun parseDate(raw: String?): Instant = raw?.trim()?.takeIf { it.isNotEmpty() }?.let { value ->
-    runCatching { OffsetDateTime.parse(value, DateTimeFormatter.RFC_1123_DATE_TIME).toInstant() }
-        .recoverCatching { OffsetDateTime.parse(value).toInstant() }
-        .getOrNull()
-} ?: Instant.EPOCH
 
 /** Stable id so reveal-state + dedup survive refresh: guid, else link, else a synthetic hash. */
 private fun stableId(raw: RawFeedItem): String =
@@ -45,7 +33,7 @@ fun RawFeedItem.toEntity(sourceName: String, classification: Classification): Ne
     summary = description.stripHtml(),
     link = link,
     imageUrl = imageUrl,
-    publishedAtEpochMs = parseDate(pubDate).toEpochMilli(),
+    publishedAtEpochMs = parseFeedDate(pubDate),
 )
 
 fun NewsItemEntity.toDomain(): NewsItem = NewsItem(

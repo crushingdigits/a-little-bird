@@ -24,6 +24,7 @@ hiltNavigationCompose = "1.3.0"
 nav3 = "1.1.2"
 lifecycleViewmodelNav3 = "2.10.0"
 serializationJson = "1.11.0"
+kotlinxDatetime = "0.7.1"
 browser = "1.10.0"
 coil = "2.7.0"
 roborazzi = "1.63.0"
@@ -69,6 +70,7 @@ navigation3-runtime = { group = "androidx.navigation3", name = "navigation3-runt
 navigation3-ui = { group = "androidx.navigation3", name = "navigation3-ui", version.ref = "nav3" }
 lifecycle-viewmodel-navigation3 = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodelNav3" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serializationJson" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
 androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 roborazzi = { group = "io.github.takahirom.roborazzi", name = "roborazzi", version.ref = "roborazzi" }

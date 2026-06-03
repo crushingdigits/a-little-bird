@@ -73,6 +73,7 @@ dependencies {
     implementation(libs.navigation3.ui)
     implementation(libs.lifecycle.viewmodel.navigation3)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.datetime)
     implementation(libs.androidx.browser)
     implementation(libs.coil.compose)
     debugImplementation(libs.compose.ui.tooling)
