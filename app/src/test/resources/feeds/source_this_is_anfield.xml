@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss/">
+  <channel>
+    <title>This Is Anfield</title>
+    <item>
+      <title>Liverpool target agrees personal terms ahead of summer move</title>
+      <link>https://www.thisisanfield.com/2026/06/liverpool-target-agrees-terms/</link>
+      <dc:creator><![CDATA[This Is Anfield]]></dc:creator>
+      <pubDate>Tue, 02 Jun 2026 14:30:00 +0000</pubDate>
+      <guid isPermaLink="false">https://www.thisisanfield.com/?p=341205</guid>
+      <description><![CDATA[The Reds have reportedly won the race for the midfielder, with personal terms now agreed.]]></description>
+      <content:encoded><![CDATA[<p>The Reds have reportedly won the race for the midfielder.</p>]]></content:encoded>
+      <media:content url="https://www.thisisanfield.com/uploads/2026/06/target.jpg" medium="image"/>
+    </item>
+    <item>
+      <title>Five things we learned from Liverpool's latest training session</title>
+      <link>https://www.thisisanfield.com/2026/06/five-things-training/</link>
+      <dc:creator><![CDATA[This Is Anfield]]></dc:creator>
+      <pubDate>Mon, 01 Jun 2026 09:15:00 +0000</pubDate>
+      <guid isPermaLink="false">https://www.thisisanfield.com/?p=341180</guid>
+      <description><![CDATA[A closer look at the standout moments from the open training session at the AXA Centre.]]></description>
+      <content:encoded><![CDATA[<p>A closer look at the standout moments.</p>]]></content:encoded>
+      <media:content url="https://www.thisisanfield.com/uploads/2026/06/training.jpg" medium="image"/>
+    </item>
+  </channel>
+</rss>

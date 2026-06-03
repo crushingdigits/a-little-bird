@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+  <channel>
+    <title>Liverpool - Liverpool FC</title>
+    <item>
+      <title>Who is on Andoni Iraola backroom team? The 4 coaches who could join Liverpool</title>
+      <link>https://www.liverpool.com/liverpool-fc-news/features/iraola-coaches-34055350</link>
+      <guid>https://www.liverpool.com/liverpool-fc-news/features/iraola-coaches-34055350</guid>
+      <description><![CDATA[Andoni Iraola looks set to become the new Liverpool head coach, but which members of his staff could he bring?]]></description>
+      <pubDate>Wed, 3 Jun 2026 08:15:56 +0000</pubDate>
+      <author>Matt Addison</author>
+      <category>Liverpool FC</category>
+      <media:thumbnail url="https://i2-prod.liverpool.com/article34055390.ece/ALTERNATES/s98/0_image.jpg" width="98" height="98"></media:thumbnail>
+      <enclosure url="https://i2-prod.liverpool.com/article34055390.ece/ALTERNATES/s615/0_image.jpg" type="image/jpeg" length="754605"/>
+      <media:content url="https://i2-prod.liverpool.com/article34055390.ece/ALTERNATES/s615/0_image.jpg" type="image/jpeg" width="615" height="409"/>
+    </item>
+    <item>
+      <title>Andoni Iraola already explained Liverpool contract length after following familiar path</title>
+      <link>https://www.liverpool.com/liverpool-fc-news/features/iraola-contract-34055275</link>
+      <guid>https://www.liverpool.com/liverpool-fc-news/features/iraola-contract-34055275</guid>
+      <description><![CDATA[Liverpool is closing in on appointing Andoni Iraola as its new manager.]]></description>
+      <pubDate>Wed, 3 Jun 2026 08:11:51 +0000</pubDate>
+      <author>James Findlater</author>
+      <category>Liverpool FC</category>
+      <media:thumbnail url="https://i2-prod.liverpool.com/article34055296.ece/ALTERNATES/s98/0_image.jpg" width="98" height="98"></media:thumbnail>
+      <enclosure url="https://i2-prod.liverpool.com/article34055296.ece/ALTERNATES/s615/0_image.jpg" type="image/jpeg" length="754605"/>
+      <media:content url="https://i2-prod.liverpool.com/article34055296.ece/ALTERNATES/s615/0_image.jpg" type="image/jpeg" width="615" height="409"/>
+    </item>
+  </channel>
+</rss>

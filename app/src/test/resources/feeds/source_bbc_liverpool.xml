@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+  <channel>
+    <title>BBC Sport - Liverpool</title>
+    <item>
+      <title><![CDATA[Mohamed Salah - Egyptian king]]></title>
+      <description><![CDATA[BBC Sport visits Egypt to discover what Mohamed Salah means to the people of the football-mad country.]]></description>
+      <link>https://www.bbc.com/sport/football/articles/cx2xlk74llno?at_medium=RSS&amp;at_campaign=rss</link>
+      <guid isPermaLink="false">https://www.bbc.com/sport/football/articles/cx2xlk74llno#0</guid>
+      <pubDate>Wed, 03 Jun 2026 06:26:52 GMT</pubDate>
+      <media:thumbnail width="240" height="135" url="https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/fa1c/live/salah.jpg"/>
+    </item>
+    <item>
+      <title><![CDATA[Liverpool agree deal with Iraola to succeed Slot]]></title>
+      <description><![CDATA[Liverpool reach a verbal agreement with Andoni Iraola to take over as head coach.]]></description>
+      <link>https://www.bbc.com/sport/football/articles/c4gv1ydm4yro?at_medium=RSS&amp;at_campaign=rss</link>
+      <guid isPermaLink="false">https://www.bbc.com/sport/football/articles/c4gv1ydm4yro#0</guid>
+      <pubDate>Tue, 02 Jun 2026 20:56:47 GMT</pubDate>
+      <media:thumbnail width="240" height="135" url="https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/cf3d/live/iraola.jpg"/>
+    </item>
+  </channel>
+</rss>
