@@ -16,4 +16,10 @@ class FeedSourcesTest {
         assertThat(source("this_is_anfield").clubScoped).isTrue()
         assertThat(source("liverpool_echo").clubScoped).isTrue()
     }
+
+    @Test fun `guardian is an inherently reliable club-scoped tier-1 source`() {
+        val guardian = source("guardian_liverpool")
+        assertThat(guardian.defaultTier).isEqualTo(Tier.TIER_1_RELIABLE)
+        assertThat(guardian.clubScoped).isTrue()
+    }
 }

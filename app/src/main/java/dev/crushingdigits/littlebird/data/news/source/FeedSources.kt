@@ -26,5 +26,11 @@ object FeedSources {
             url = "https://feeds.bbci.co.uk/sport/football/teams/liverpool/rss.xml",
             defaultTier = Tier.TIER_1_RELIABLE,
         ),
+        FeedSource(
+            id = "guardian_liverpool",
+            name = "The Guardian — Liverpool",
+            url = "https://www.theguardian.com/football/liverpool/rss",
+            defaultTier = Tier.TIER_1_RELIABLE,
+        ),
     )
 }
