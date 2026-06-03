@@ -9,18 +9,19 @@ import dev.crushingdigits.littlebird.domain.model.Tier
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 private val htmlTag = Regex("<[^>]+>")
 private val whitespace = Regex("\\s+")
-private val rfc822 = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH)
 
 private fun String.stripHtml(): String = htmlTag.replace(this, "").replace(whitespace, " ").trim()
 
-/** RFC-822 (RSS pubDate) first, then ISO-8601 (Atom). Unknown/blank → EPOCH. */
+/**
+ * RFC-1123/822 (RSS pubDate) — tolerant of single-digit days (`3 Jun`) and zone names
+ * (`GMT`) as well as numeric offsets (`+0000`) — then ISO-8601 (Atom). Unknown/blank → EPOCH.
+ */
 private fun parseDate(raw: String?): Instant = raw?.trim()?.takeIf { it.isNotEmpty() }?.let { value ->
-    runCatching { OffsetDateTime.parse(value, rfc822).toInstant() }
-        .recoverCatching { _ -> OffsetDateTime.parse(value).toInstant() }
+    runCatching { OffsetDateTime.parse(value, DateTimeFormatter.RFC_1123_DATE_TIME).toInstant() }
+        .recoverCatching { OffsetDateTime.parse(value).toInstant() }
         .getOrNull()
 } ?: Instant.EPOCH
 
