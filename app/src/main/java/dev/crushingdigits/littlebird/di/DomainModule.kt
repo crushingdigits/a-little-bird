@@ -4,6 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dev.crushingdigits.littlebird.domain.usecase.FilterFeed
+import dev.crushingdigits.littlebird.domain.usecase.FilterFeedUseCase
 import dev.crushingdigits.littlebird.domain.usecase.MarkWatched
 import dev.crushingdigits.littlebird.domain.usecase.MarkWatchedUseCase
 import dev.crushingdigits.littlebird.domain.usecase.ObserveFeed
@@ -37,4 +39,5 @@ abstract class DomainModule {
     @Binds abstract fun markWatched(impl: MarkWatchedUseCase): MarkWatched
     @Binds abstract fun restoreRevealed(impl: RestoreRevealedUseCase): RestoreRevealed
     @Binds abstract fun observeNewsItem(impl: ObserveNewsItemUseCase): ObserveNewsItem
+    @Binds internal abstract fun filterFeed(impl: FilterFeedUseCase): FilterFeed
 }
