@@ -3,14 +3,21 @@ package dev.crushingdigits.littlebird.ui.feed
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.crushingdigits.littlebird.domain.model.FeedFilter
+import dev.crushingdigits.littlebird.domain.model.FeedType
 import dev.crushingdigits.littlebird.domain.model.NewsItem
+import dev.crushingdigits.littlebird.domain.model.Tier
+import dev.crushingdigits.littlebird.domain.usecase.FilterFeed
 import dev.crushingdigits.littlebird.domain.usecase.MarkWatched
 import dev.crushingdigits.littlebird.domain.usecase.ObserveFeed
+import dev.crushingdigits.littlebird.domain.usecase.ObserveFilterPrefs
 import dev.crushingdigits.littlebird.domain.usecase.ObserveProtection
 import dev.crushingdigits.littlebird.domain.usecase.ObserveRevealed
 import dev.crushingdigits.littlebird.domain.usecase.RefreshFeed
 import dev.crushingdigits.littlebird.domain.usecase.RestoreRevealed
 import dev.crushingdigits.littlebird.domain.usecase.RevealItem
+import dev.crushingdigits.littlebird.domain.usecase.SetPinnedFeed
+import dev.crushingdigits.littlebird.domain.usecase.SetReliabilityLevel
 import dev.crushingdigits.littlebird.domain.usecase.ToggleProtection
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +41,10 @@ class FeedViewModel @Inject constructor(
     private val revealItem: RevealItem,
     private val markWatched: MarkWatched,
     private val restoreRevealed: RestoreRevealed,
+    private val filterFeed: FilterFeed,
+    private val observeFilterPrefs: ObserveFilterPrefs,
+    private val setReliabilityLevel: SetReliabilityLevel,
+    private val setPinnedFeed: SetPinnedFeed,
 ) : ViewModel() {
 
     private val refreshing = MutableStateFlow(false)
@@ -41,18 +52,34 @@ class FeedViewModel @Inject constructor(
     private val gateTarget = MutableStateFlow<NewsItem?>(null)
     private val catchUpVisible = MutableStateFlow(false)
 
+    // Session-only selected feed; re-seeded from the pinned feed on cold launch.
+    private val selectedType = MutableStateFlow(FeedType.ALL)
+
     private val _actions = MutableSharedFlow<FeedAction>(extraBufferCapacity = 1)
     val actions: SharedFlow<FeedAction> = _actions.asSharedFlow()
+
+    init {
+        viewModelScope.launch {
+            selectedType.value = observeFilterPrefs().first().pinned ?: FeedType.ALL
+        }
+    }
 
     private data class Transient(val refreshing: Boolean, val offline: Boolean, val gate: NewsItem?, val catchUp: Boolean)
     private val transient = combine(refreshing, offline, gateTarget, catchUpVisible, ::Transient)
 
+    private data class FilterState(val type: FeedType, val maxTier: Tier, val pinned: FeedType?)
+    private val filterState = combine(selectedType, observeFilterPrefs()) { type, prefs ->
+        FilterState(type, prefs.maxTier, prefs.pinned)
+    }
+
     val uiState: StateFlow<FeedUiState> = combine(
-        observeFeed(), observeProtection(), observeRevealed(), transient,
-    ) { items, protectionOn, revealed, t ->
-        val cards = items.map { item ->
+        observeFeed(), observeProtection(), observeRevealed(), filterState, transient,
+    ) { items, protectionOn, revealed, fs, t ->
+        val filtered = filterFeed(items, FeedFilter(fs.type, fs.maxTier))
+        val cards = filtered.visible.map { item ->
             if (protectionOn && item.isMatch && item.id !in revealed) FeedCard.Redacted(item) else FeedCard.Normal(item)
         }
+        // Held count is GLOBAL (whole feed), so catch-up is consistent across tabs.
         val held = items.count { protectionOn && it.isMatch && it.id !in revealed }
         FeedUiState(
             cards = cards,
@@ -63,6 +90,11 @@ class FeedViewModel @Inject constructor(
             isEmpty = items.isEmpty() && !t.refreshing,
             gateTarget = t.gate,
             catchUpVisible = t.catchUp,
+            filterTabs = FeedType.entries.map { FeedTab(it, filtered.counts[it] ?: 0) },
+            selectedType = fs.type,
+            reliabilityLevel = fs.maxTier,
+            pinnedType = fs.pinned,
+            isFilteredEmpty = items.isNotEmpty() && filtered.visible.isEmpty() && !t.refreshing,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FeedUiState())
 
@@ -112,5 +144,15 @@ class FeedViewModel @Inject constructor(
         val result = refreshFeed()
         offline.value = result.isFailure
         refreshing.value = false
+    }
+
+    // ---- filter handlers ----
+    fun onSelectType(type: FeedType) { selectedType.value = type }
+    fun onSetReliability(maxTier: Tier) = viewModelScope.launch { setReliabilityLevel(maxTier) }
+    fun onResetReliability() = viewModelScope.launch { setReliabilityLevel(Tier.TIER_3_SPECULATIVE) }
+    fun onTogglePin() = viewModelScope.launch {
+        val current = selectedType.value
+        val pinned = observeFilterPrefs().first().pinned
+        setPinnedFeed(if (pinned == current) null else current)
     }
 }
