@@ -17,6 +17,8 @@ import dev.crushingdigits.littlebird.domain.model.FeedType
 import dev.crushingdigits.littlebird.domain.model.Tier
 import dev.crushingdigits.littlebird.ui.feed.FeedTab
 import dev.crushingdigits.littlebird.ui.feed.filter.FeedTypeTabs
+import dev.crushingdigits.littlebird.ui.feed.filter.FilterEmpty
+import dev.crushingdigits.littlebird.ui.feed.filter.PinButton
 import dev.crushingdigits.littlebird.ui.feed.filter.ReliabilityLadder
 import dev.crushingdigits.littlebird.ui.theme.LittleBirdTheme
 import org.junit.Rule
@@ -85,6 +87,24 @@ class FilterComponentsScreenshotTest {
     @Test fun `type tabs - transfers selected and pinned`() {
         composeTestRule.captureThemed("FilterComponentsScreenshotTest_type_tabs_transfers_pinned.png") {
             FeedTypeTabs(tabs = sampleTabs, selected = FeedType.TRANSFERS, pinned = FeedType.TRANSFERS, onSelect = {})
+        }
+    }
+
+    @Test fun `pin button - on`() {
+        composeTestRule.captureThemed("FilterComponentsScreenshotTest_pin_button_on.png") {
+            PinButton(pinned = true, onToggle = {})
+        }
+    }
+
+    @Test fun `pin button - off`() {
+        composeTestRule.captureThemed("FilterComponentsScreenshotTest_pin_button_off.png") {
+            PinButton(pinned = false, onToggle = {})
+        }
+    }
+
+    @Test fun `filter empty state`() {
+        composeTestRule.captureThemed("FilterComponentsScreenshotTest_filter_empty.png") {
+            FilterEmpty(onShowAllTiers = {})
         }
     }
 }
