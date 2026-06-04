@@ -38,5 +38,12 @@ object FeedSources {
             url = "https://www.davidlynchlfc.co.uk/feed",
             defaultTier = Tier.TIER_2_BEAT,
         ),
+        FeedSource(
+            id = "fabrizio_romano",
+            name = "Fabrizio Romano",
+            url = "https://www.caughtoffside.com/author/fabrizio-romano/feed/",
+            defaultTier = Tier.TIER_2_BEAT,
+            clubScoped = false,
+        ),
     )
 }

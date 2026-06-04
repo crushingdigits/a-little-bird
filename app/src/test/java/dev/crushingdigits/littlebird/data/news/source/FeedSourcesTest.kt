@@ -28,4 +28,10 @@ class FeedSourcesTest {
         assertThat(lynch.defaultTier).isEqualTo(Tier.TIER_2_BEAT)
         assertThat(lynch.clubScoped).isTrue()
     }
+
+    @Test fun `fabrizio romano is a non-club-scoped tier-2 source`() {
+        val romano = source("fabrizio_romano")
+        assertThat(romano.defaultTier).isEqualTo(Tier.TIER_2_BEAT)
+        assertThat(romano.clubScoped).isFalse()
+    }
 }
