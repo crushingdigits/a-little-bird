@@ -12,6 +12,10 @@ interface PreferencesRepository {
     suspend fun reveal(id: String)
     suspend fun revealAll(ids: Set<String>)
     suspend fun restoreRevealed(ids: Set<String>)
+    fun observeReliabilityLevel(): Flow<Int>
+    fun observePinnedFeed(): Flow<String?>
+    suspend fun setReliabilityLevel(level: Int)
+    suspend fun setPinnedFeed(key: String?)
 }
 
 class PreferencesRepositoryImpl(private val source: PreferencesDataSource) : PreferencesRepository {
@@ -22,4 +26,8 @@ class PreferencesRepositoryImpl(private val source: PreferencesDataSource) : Pre
     override suspend fun reveal(id: String) = source.setRevealedIds(source.revealedIds.first() + id)
     override suspend fun revealAll(ids: Set<String>) = source.setRevealedIds(source.revealedIds.first() + ids)
     override suspend fun restoreRevealed(ids: Set<String>) = source.setRevealedIds(ids)
+    override fun observeReliabilityLevel(): Flow<Int> = source.reliabilityLevel
+    override fun observePinnedFeed(): Flow<String?> = source.pinnedFeed
+    override suspend fun setReliabilityLevel(level: Int) = source.setReliabilityLevel(level)
+    override suspend fun setPinnedFeed(key: String?) = source.setPinnedFeed(key)
 }

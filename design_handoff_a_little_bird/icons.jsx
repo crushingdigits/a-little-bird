@@ -34,8 +34,16 @@ const IcStar = ({ s = 24 }) => (
 );
 const IcInfo = ({ s = 24 }) => _sv(s, <><circle cx="12" cy="12" r="9" /><path d="M12 11v5" /><path d="M12 8h.01" /></>);
 const IcEye = ({ s = 24 }) => _sv(s, <><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" /><circle cx="12" cy="12" r="3" /></>);
+const IcPin = ({ s = 24 }) => _sv(s, <><path d="M9 3h6l-1 5 3 3v2H7v-2l3-3-1-5z" /><path d="M12 13v8" /></>);
+const IcPinFill = ({ s = 24 }) => (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round">
+    <path d="M9 3h6l-1 5 3 3v2H7v-2l3-3-1-5z" /><path d="M12 13v8" stroke="currentColor" strokeLinecap="round" />
+  </svg>
+);
+const IcList = ({ s = 24 }) => _sv(s, <><path d="M8 6h13" /><path d="M8 12h13" /><path d="M8 18h13" /><circle cx="3.5" cy="6" r="1" /><circle cx="3.5" cy="12" r="1" /><circle cx="3.5" cy="18" r="1" /></>);
 
 Object.assign(window, {
   IcShield, IcShieldFill, IcBack, IcClose, IcHome, IcBell, IcBellOff, IcTune,
   IcMore, IcBookmark, IcShare, IcCheck, IcLock, IcChevR, IcStar, IcInfo, IcEye,
+  IcPin, IcPinFill, IcList,
 });

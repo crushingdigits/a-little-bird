@@ -61,6 +61,8 @@ class FakeNewsRepository : NewsRepository {
 class FakePreferencesRepository : PreferencesRepository {
     private val protection = MutableStateFlow(true)
     private val revealed = MutableStateFlow<Set<String>>(emptySet())
+    private val reliabilityLevel = MutableStateFlow(3)
+    private val pinnedFeed = MutableStateFlow<String?>(null)
 
     override fun observeProtection(): Flow<Boolean> = protection
     override fun observeRevealed(): Flow<Set<String>> = revealed
@@ -69,6 +71,10 @@ class FakePreferencesRepository : PreferencesRepository {
     override suspend fun reveal(id: String) { revealed.value = revealed.value + id }
     override suspend fun revealAll(ids: Set<String>) { revealed.value = revealed.value + ids }
     override suspend fun restoreRevealed(ids: Set<String>) { revealed.value = ids }
+    override fun observeReliabilityLevel(): Flow<Int> = reliabilityLevel
+    override fun observePinnedFeed(): Flow<String?> = pinnedFeed
+    override suspend fun setReliabilityLevel(level: Int) { reliabilityLevel.value = level }
+    override suspend fun setPinnedFeed(key: String?) { pinnedFeed.value = key }
 }
 
 @Module

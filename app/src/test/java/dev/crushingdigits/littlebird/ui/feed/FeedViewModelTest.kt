@@ -8,13 +8,18 @@ import dev.crushingdigits.littlebird.data.preferences.PreferencesRepository
 import dev.crushingdigits.littlebird.domain.model.Category
 import dev.crushingdigits.littlebird.domain.model.NewsItem
 import dev.crushingdigits.littlebird.domain.model.Tier
+import dev.crushingdigits.littlebird.domain.model.FeedType
+import dev.crushingdigits.littlebird.domain.usecase.FilterFeedUseCase
 import dev.crushingdigits.littlebird.domain.usecase.MarkWatchedUseCase
 import dev.crushingdigits.littlebird.domain.usecase.ObserveFeedUseCase
+import dev.crushingdigits.littlebird.domain.usecase.ObserveFilterPrefsUseCase
 import dev.crushingdigits.littlebird.domain.usecase.ObserveProtectionUseCase
 import dev.crushingdigits.littlebird.domain.usecase.ObserveRevealedUseCase
 import dev.crushingdigits.littlebird.domain.usecase.RefreshFeedUseCase
 import dev.crushingdigits.littlebird.domain.usecase.RestoreRevealedUseCase
 import dev.crushingdigits.littlebird.domain.usecase.RevealItemUseCase
+import dev.crushingdigits.littlebird.domain.usecase.SetPinnedFeedUseCase
+import dev.crushingdigits.littlebird.domain.usecase.SetReliabilityLevelUseCase
 import dev.crushingdigits.littlebird.domain.usecase.ToggleProtectionUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,6 +38,12 @@ class FeedViewModelTest {
         link = "https://x/$id", imageUrl = null, publishedAt = Instant.ofEpochMilli(1),
     )
 
+    private fun item(id: String, category: Category, tier: Tier = Tier.TIER_1_RELIABLE) = NewsItem(
+        id = id, source = "BBC", tier = tier, category = category, isMatch = category == Category.MATCH,
+        confirmed = false, author = null, role = null, title = "t$id", summary = "s",
+        link = "https://x/$id", imageUrl = null, publishedAt = Instant.ofEpochMilli(1),
+    )
+
     private class FakeNews(items: List<NewsItem>) : NewsRepository {
         val flow = MutableStateFlow(items)
         override fun observeFeed(): Flow<List<NewsItem>> = flow
@@ -40,9 +51,11 @@ class FeedViewModelTest {
         override suspend fun refresh(): Result<Unit> = Result.success(Unit)
         override suspend fun isEmpty(): Boolean = flow.value.isEmpty()
     }
-    private class FakePrefs(on: Boolean) : PreferencesRepository {
+    private class FakePrefs(on: Boolean, pinned: String? = null, level: Int = 3) : PreferencesRepository {
         val protection = MutableStateFlow(on)
         val revealed = MutableStateFlow<Set<String>>(emptySet())
+        val reliabilityLevel = MutableStateFlow(level)
+        val pinnedFeed = MutableStateFlow(pinned)
         override fun observeProtection() = protection
         override fun observeRevealed() = revealed
         override suspend fun setProtection(on: Boolean) { protection.value = on }
@@ -50,6 +63,10 @@ class FeedViewModelTest {
         override suspend fun reveal(id: String) { revealed.value = revealed.value + id }
         override suspend fun revealAll(ids: Set<String>) { revealed.value = revealed.value + ids }
         override suspend fun restoreRevealed(ids: Set<String>) { revealed.value = ids }
+        override fun observeReliabilityLevel() = reliabilityLevel
+        override fun observePinnedFeed() = pinnedFeed
+        override suspend fun setReliabilityLevel(level: Int) { reliabilityLevel.value = level }
+        override suspend fun setPinnedFeed(key: String?) { pinnedFeed.value = key }
     }
 
     private fun vm(news: FakeNews, prefs: FakePrefs) = FeedViewModel(
@@ -61,6 +78,10 @@ class FeedViewModelTest {
         revealItem = RevealItemUseCase(prefs),
         markWatched = MarkWatchedUseCase(prefs),
         restoreRevealed = RestoreRevealedUseCase(prefs),
+        filterFeed = FilterFeedUseCase(),
+        observeFilterPrefs = ObserveFilterPrefsUseCase(prefs),
+        setReliabilityLevel = SetReliabilityLevelUseCase(prefs),
+        setPinnedFeed = SetPinnedFeedUseCase(prefs),
     )
 
     @Test fun `protection off renders everything Normal`() = runTest {
@@ -138,5 +159,67 @@ class FeedViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
         assertThat(prefs.revealed.value).contains("m")
+    }
+
+    @Test fun `selecting a type filters the visible cards`() = runTest {
+        val news = FakeNews(listOf(item("t", Category.TRANSFER), item("m", Category.MATCH)))
+        val sut = vm(news, FakePrefs(on = false))
+        sut.onSelectType(FeedType.TRANSFERS)
+        sut.uiState.test {
+            val s = awaitItem()
+            assertThat(s.cards.map { it.item.id }).containsExactly("t")
+            assertThat(s.selectedType).isEqualTo(FeedType.TRANSFERS)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `lowering reliability hides higher-tier items and updates counts`() = runTest {
+        val news = FakeNews(
+            listOf(
+                item("t1", Category.TRANSFER, Tier.TIER_1_RELIABLE),
+                item("t3", Category.TRANSFER, Tier.TIER_3_SPECULATIVE),
+            ),
+        )
+        val sut = vm(news, FakePrefs(on = false))
+        sut.onSetReliability(Tier.TIER_1_RELIABLE)
+        sut.uiState.test {
+            val s = awaitItem()
+            assertThat(s.cards.map { it.item.id }).containsExactly("t1")
+            assertThat(s.filterTabs.first { it.type == FeedType.ALL }.count).isEqualTo(1)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `toggling pin pins then unpins the current feed`() = runTest {
+        val prefs = FakePrefs(on = false)
+        val sut = vm(FakeNews(listOf(item("t", Category.TRANSFER))), prefs)
+        sut.onSelectType(FeedType.TRANSFERS)
+        sut.onTogglePin()
+        assertThat(prefs.pinnedFeed.value).isEqualTo("transfer")
+        sut.onTogglePin()
+        assertThat(prefs.pinnedFeed.value).isNull()
+    }
+
+    @Test fun `isFilteredEmpty is set when the feed has items but none match`() = runTest {
+        val sut = vm(FakeNews(listOf(item("t", Category.TRANSFER))), FakePrefs(on = false))
+        sut.onSelectType(FeedType.MATCH)
+        sut.uiState.test {
+            val s = awaitItem()
+            assertThat(s.cards).isEmpty()
+            assertThat(s.isFilteredEmpty).isTrue()
+            assertThat(s.isEmpty).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `cold launch seeds the selected type from the pinned feed`() = runTest {
+        val news = FakeNews(listOf(item("t", Category.TRANSFER), item("m", Category.MATCH)))
+        val sut = vm(news, FakePrefs(on = false, pinned = "match"))
+        sut.uiState.test {
+            val s = awaitItem()
+            assertThat(s.selectedType).isEqualTo(FeedType.MATCH)
+            assertThat(s.cards.map { it.item.id }).containsExactly("m")
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }

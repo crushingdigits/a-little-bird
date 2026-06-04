@@ -16,6 +16,57 @@ const FEED = [
     ],
   },
   {
+    id: "ft", tier: 1, source: "Liverpool FC", author: "Liverpool FC", role: "Official club",
+    cat: "Match", time: "14m", confirmed: false, match: true, image: false,
+    headline: "Full-time report: official match summary now live",
+    lead: "The club's official full-time report covering the result, goals and key moments is now available.",
+    paras: ["This article contains the final score and a breakdown of how the match unfolded."],
+    corrob: null,
+  },
+  {
+    id: "rb", tier: 1, source: "Fabrizio Romano", author: "Fabrizio Romano", role: "Transfer reporting",
+    cat: "Transfer", time: "19m", confirmed: true, match: false, image: true,
+    headline: "Right-back deal agreed in full — medical booked for Monday",
+    lead: "A full agreement has been struck for the right-back, with the medical scheduled early next week ahead of an announcement.",
+    paras: [
+      "Personal terms were never an issue and the clubs have now settled on a fee structure including add-ons.",
+      "The player will travel for his medical on Monday, with the club hoping to confirm the signing within days.",
+    ],
+    corrob: [
+      { tier: 1, name: "David Ornstein" },
+      { tier: 2, name: "Liverpool Echo" },
+    ],
+  },
+  {
+    id: "match1", tier: 2, source: "BBC Sport", author: "BBC Sport", role: "Match coverage",
+    cat: "Match", time: "22m", confirmed: false, match: true, image: false,
+    headline: "Match report: full-time ratings & tactical breakdown",
+    lead: "A full-time report covering the result, key moments and player performances.",
+    paras: ["This article contains the final score and match details."],
+    corrob: null,
+  },
+  {
+    id: "live", tier: 2, source: "Liverpool Echo", author: "Liverpool Echo", role: "Live coverage",
+    cat: "Match", time: "28m", confirmed: false, match: true, image: false,
+    headline: "Live: second-half flashpoints and key incidents",
+    lead: "Rolling live coverage of the second half, including chances, bookings and tactical changes.",
+    paras: ["This live blog reveals the current scoreline and how the game is developing."],
+    corrob: null,
+  },
+  {
+    id: "capt", tier: 1, source: "The Athletic", author: "David Ornstein", role: "The Athletic",
+    cat: "Contract", time: "33m", confirmed: true, match: false, image: false,
+    headline: "Captain on brink of new extension — here we go",
+    lead: "The club captain is closing in on a new long-term contract, with all parties aligned and an announcement imminent.",
+    paras: [
+      "Negotiations have been straightforward, reflecting a mutual desire to continue, and only the final formalities remain.",
+    ],
+    corrob: [
+      { tier: 1, name: "Fabrizio Romano" },
+      { tier: 2, name: "This Is Anfield" },
+    ],
+  },
+  {
     id: "coach", tier: 2, source: "This Is Anfield", author: "This Is Anfield", role: "Beat reporting",
     cat: "Coaching", time: "41m", confirmed: false, match: false, image: false,
     headline: "New set-piece coach expected to join the backroom staff",
@@ -27,12 +78,16 @@ const FEED = [
     corrob: null,
   },
   {
-    id: "match1", tier: 2, source: "BBC Sport", author: "BBC Sport", role: "Match coverage",
-    cat: "Match", time: "22m", confirmed: false, match: true, image: false,
-    headline: "Match report: full-time ratings & tactical breakdown",
-    lead: "A full-time report covering the result, key moments and player performances.",
-    paras: ["This article contains the final score and match details."],
-    corrob: null,
+    id: "sd", tier: 1, source: "Liverpool FC", author: "Liverpool FC", role: "Official club",
+    cat: "Backroom", time: "52m", confirmed: true, match: false, image: false,
+    headline: "Club confirms new sporting director appointment",
+    lead: "Liverpool have officially announced the appointment of a new sporting director to lead football operations.",
+    paras: [
+      "The appointment follows an extensive search and is expected to shape recruitment strategy for the seasons ahead.",
+    ],
+    corrob: [
+      { tier: 1, name: "Liverpool FC (Official)" },
+    ],
   },
   {
     id: "contract", tier: 1, source: "Liverpool FC", author: "Liverpool FC", role: "Official club",
@@ -56,6 +111,26 @@ const FEED = [
     corrob: null,
   },
   {
+    id: "keeper", tier: 2, source: "Liverpool Echo", author: "Liverpool Echo", role: "Beat reporting",
+    cat: "Transfer", time: "1h", confirmed: false, match: false, image: false,
+    headline: "Echo: Reds open talks over experienced backup keeper",
+    lead: "Liverpool have opened early discussions over an experienced goalkeeper to provide senior cover next season.",
+    paras: [
+      "The club are keen to add depth in the position and view the target as a reliable, low-risk option.",
+    ],
+    corrob: null,
+  },
+  {
+    id: "asst", tier: 2, source: "This Is Anfield", author: "This Is Anfield", role: "Beat reporting",
+    cat: "Coaching", time: "2h", confirmed: false, match: false, image: false,
+    headline: "Assistant boss agrees to extend his Anfield stay",
+    lead: "A key member of the coaching team is set to extend his stay after agreeing fresh terms with the club.",
+    paras: [
+      "The continuity is seen as important to the manager as preparations for the new campaign continue.",
+    ],
+    corrob: null,
+  },
+  {
     id: "rumor", tier: 3, source: "Daily Mirror", author: "Daily Mirror", role: "Aggregated speculation",
     cat: "Transfer", time: "2h", confirmed: false, match: false, image: false,
     headline: "Reds 'eyeing' shock swoop for La Liga forward, claim reports",
@@ -74,11 +149,29 @@ const FEED = [
     corrob: null,
   },
   {
+    id: "u21", tier: 2, source: "This Is Anfield", author: "This Is Anfield", role: "Academy reporting",
+    cat: "Academy", time: "3h", confirmed: false, match: false, image: false,
+    headline: "U21 playmaker rewarded with first professional deal",
+    lead: "A standout U21 playmaker has signed his first professional contract after an impressive year in the youth ranks.",
+    paras: ["The deal caps a strong season and keeps one of the academy's brightest talents on the books."],
+    corrob: null,
+  },
+  {
     id: "academy", tier: 2, source: "This Is Anfield", author: "This Is Anfield", role: "Beat reporting",
     cat: "Academy", time: "4h", confirmed: false, match: false, image: false,
     headline: "Highly-rated U18 striker promoted to first-team training",
     lead: "A standout young striker has been promoted to train with the senior squad after a prolific run at youth level.",
     paras: ["Coaches have been impressed by his finishing and movement, and the step up is seen as a reward for his form."],
+    corrob: null,
+  },
+  {
+    id: "winger", tier: 3, source: "TuttoMercato", author: "TuttoMercato", role: "Aggregated speculation",
+    cat: "Transfer", time: "5h", confirmed: false, match: false, image: false,
+    headline: "Italian outlet claims surprise interest in Serie A winger",
+    lead: "An Italian outlet suggests Liverpool are among clubs monitoring a Serie A winger, though details are thin.",
+    paras: [
+      "No fee, timeline or corroboration accompanies the claim, and it should be treated as early-window speculation.",
+    ],
     corrob: null,
   },
 ];
@@ -89,4 +182,22 @@ const TIER_META = {
   3: { label: "SPECULATIVE", cls: "t3" },
 };
 
-Object.assign(window, { FEED, TIER_META });
+// News-type groups — used by every filter pattern (tabs, chips, sheet).
+// "all" is the catch-all feed; the rest map to one or more raw categories.
+const NEWS_TYPES = [
+  { key: "all", label: "All news", short: "All", cats: null },
+  { key: "transfer", label: "Transfers", short: "Transfers", cats: ["Transfer"] },
+  { key: "match", label: "Match news", short: "Match", cats: ["Match"] },
+  { key: "staff", label: "Squad & staff", short: "Squad & staff", cats: ["Coaching", "Backroom"] },
+  { key: "contract", label: "Contracts", short: "Contracts", cats: ["Contract"] },
+  { key: "academy", label: "Academy", short: "Academy", cats: ["Academy"] },
+];
+
+// Tier filter modes shared by all patterns.
+const TIER_MODES = [
+  { key: "all", label: "All tiers", tiers: [1, 2, 3] },
+  { key: "t12", label: "T1 · T2", tiers: [1, 2] },
+  { key: "t1", label: "T1 only", tiers: [1] },
+];
+
+Object.assign(window, { FEED, TIER_META, NEWS_TYPES, TIER_MODES });
