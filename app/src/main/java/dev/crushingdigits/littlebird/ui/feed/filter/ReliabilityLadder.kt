@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -61,6 +62,7 @@ fun ReliabilityLadder(
             val pip = tierColor(tier).copy(alpha = if (included) 1f else 0.35f)
             Box(
                 modifier = Modifier
+                    .testTag("tier_${tier.ordinal + 1}")
                     .height(32.dp)
                     .background(if (included) MaterialTheme.colorScheme.surfaceContainerHighest else Color.Transparent)
                     .drawBehind {

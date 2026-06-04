@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
@@ -50,6 +51,6 @@ fun FilterEmpty(onShowAllTiers: () -> Unit, modifier: Modifier = Modifier) {
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(16.dp))
-        FilledTonalButton(onClick = onShowAllTiers) { Text("Show all tiers") }
+        FilledTonalButton(onClick = onShowAllTiers, modifier = Modifier.testTag("showAllTiers")) { Text("Show all tiers") }
     }
 }
