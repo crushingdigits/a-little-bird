@@ -55,7 +55,7 @@ Romano's CaughtOffside feed is transfer-wide. Left raw it would inject non-Liver
 
 - `FeedSource` gains `clubScoped: Boolean = true`.
 - `fabrizio_romano` sets `clubScoped = false`; every existing/other source stays `true`.
-- A `LiverpoolRelevanceFilter` runs at **ingestion time** (in the remote data source, after parse, before classify/persist). For non-club-scoped sources only, it keeps items whose normalized `title + description` contains any term in a config allowlist: `liverpool`, `anfield`, `reds`, `lfc`, and the current manager surname (e.g. `slot`). Club-scoped sources bypass the filter entirely.
+- A `LiverpoolRelevanceFilter` runs at **ingestion time** (in `NewsRepositoryImpl.refresh()`, after parse, before classify/persist). For non-club-scoped sources only, it keeps items whose normalized `title + description` contains any term in a config allowlist. As shipped, `defaultLiverpoolTerms = { liverpool, anfield, lfc, the reds, the kop }`. (Bare `reds` was tightened to `the reds` to avoid matching "Red Bull"/"red card"; `the kop` was added. The *manager surname* term floated at design time was **dropped on purpose** — it is too volatile to hardcode, as the live feeds confirmed mid-implementation when the manager changed. Liverpool stories naming only a player and the manager, with no club token in title/description, are a known recall gap deferred to a future tuning door.) Club-scoped sources bypass the filter entirely.
 - The allowlist is config data (lives beside `TierConfig`), tunable without code changes.
 
 ## 6. Tier resolution algorithm
@@ -75,7 +75,7 @@ Romano's CaughtOffside feed is transfer-wide. Left raw it would inject non-Liver
 
 - **`bbc_liverpool` floor: `TIER_2_BEAT` → `TIER_1_RELIABLE`.** *Accepted consequence: every BBC item now reads RELIABLE, including match reports and previews — the price of treating the institution as inherently reliable.*
 - **Trusted journalists:** `david ornstein`, `fabrizio romano`, **`david lynch`** (new).
-- **Confirmation phrases** (multi-word, to avoid bare-word false positives like "win confirmed"): `"here we go"`, `"done deal"`, `"deal done"`, `"deal agreed"`, `"agreement reached"`, `"medical completed"`, `"medical booked"`, `"officially signed"`, `"transfer confirmed"`, `"deal confirmed"`, `"completed the signing"`, `"sealed"`. (Final list tuned against real fixtures.)
+- **Confirmation phrases** (multi-word, to avoid bare-word false positives like "win confirmed"). As shipped: `"here we go"`, `"done deal"`, `"deal done"`, `"deal agreed"`, `"agreement reached"`, `"medical completed"`, `"officially signed"`, `"transfer confirmed"`, `"deal confirmed"`, `"completed the signing"`, `"deal sealed"`. (During implementation, bare `"sealed"` was tightened to `"deal sealed"` and the redundant `"medical booked"` dropped — both to keep every phrase multi-word.)
 - **Tentative phrases** (cap a trusted journalist at T2): `"interested in"`, `"keen on"`, `"linked with"`, `"in talks"`, `"monitoring"`, `"tracking"`, `"eyeing"`, `"considering"`, `"reportedly"`, `"could sign"`, `"target"`, `"rumour"`, `"rumor"`. (Final list tuned against real fixtures.)
 - **Tabloids:** unchanged (`daily mirror`, `the sun`, `the mirror`, `mirror`, `sun`).
 - **Labels:** **unchanged** — `RELIABLE` / `BEAT` / `SPECULATIVE`. No UI churn; under the new model T2 ("BEAT") reads as "credible but unconfirmed," which still fits.

@@ -21,4 +21,10 @@ class LiverpoolRelevanceFilterTest {
     @Test fun `matching is case-insensitive`() {
         assertThat(subject.isRelevant("LIVERPOOL CLOSING IN", "")).isTrue()
     }
+
+    @Test fun `keeps items matched by the other default terms`() {
+        assertThat(subject.isRelevant("LFC confirm pre-season tour", "")).isTrue()
+        assertThat(subject.isRelevant("Transfer latest", "The Reds are pushing hard")).isTrue()
+        assertThat(subject.isRelevant("Atmosphere returns", "The Kop in full voice")).isTrue()
+    }
 }
