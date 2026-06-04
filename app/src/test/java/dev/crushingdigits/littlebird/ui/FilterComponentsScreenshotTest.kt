@@ -13,7 +13,10 @@ import androidx.compose.ui.unit.dp
 import com.github.takahirom.roborazzi.RobolectricDeviceQualifiers
 import com.github.takahirom.roborazzi.RoborazziOptions
 import com.github.takahirom.roborazzi.captureRoboImage
+import dev.crushingdigits.littlebird.domain.model.FeedType
 import dev.crushingdigits.littlebird.domain.model.Tier
+import dev.crushingdigits.littlebird.ui.feed.FeedTab
+import dev.crushingdigits.littlebird.ui.feed.filter.FeedTypeTabs
 import dev.crushingdigits.littlebird.ui.feed.filter.ReliabilityLadder
 import dev.crushingdigits.littlebird.ui.theme.LittleBirdTheme
 import org.junit.Rule
@@ -61,6 +64,27 @@ class FilterComponentsScreenshotTest {
     @Test fun `reliability ladder - level 3`() {
         composeTestRule.captureThemed("FilterComponentsScreenshotTest_reliability_ladder_level3.png") {
             ReliabilityLadder(selected = Tier.TIER_3_SPECULATIVE, onSelect = {})
+        }
+    }
+
+    private val sampleTabs = listOf(
+        FeedTab(FeedType.ALL, 12),
+        FeedTab(FeedType.TRANSFERS, 5),
+        FeedTab(FeedType.MATCH, 0),
+        FeedTab(FeedType.SQUAD_STAFF, 3),
+        FeedTab(FeedType.CONTRACTS, 2),
+        FeedTab(FeedType.ACADEMY, 2),
+    )
+
+    @Test fun `type tabs - all selected`() {
+        composeTestRule.captureThemed("FilterComponentsScreenshotTest_type_tabs_all_selected.png") {
+            FeedTypeTabs(tabs = sampleTabs, selected = FeedType.ALL, pinned = null, onSelect = {})
+        }
+    }
+
+    @Test fun `type tabs - transfers selected and pinned`() {
+        composeTestRule.captureThemed("FilterComponentsScreenshotTest_type_tabs_transfers_pinned.png") {
+            FeedTypeTabs(tabs = sampleTabs, selected = FeedType.TRANSFERS, pinned = FeedType.TRANSFERS, onSelect = {})
         }
     }
 }
