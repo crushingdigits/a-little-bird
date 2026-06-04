@@ -44,4 +44,18 @@ class PreferencesRepositoryTest {
         subject.setProtection(false)
         assertThat(subject.observeProtection().first()).isFalse()
     }
+
+    @Test fun `reliability level defaults to 3 and persists`() = runTest {
+        assertThat(subject.observeReliabilityLevel().first()).isEqualTo(3)
+        subject.setReliabilityLevel(1)
+        assertThat(subject.observeReliabilityLevel().first()).isEqualTo(1)
+    }
+
+    @Test fun `pinned feed is absent by default, sets and clears`() = runTest {
+        assertThat(subject.observePinnedFeed().first()).isNull()
+        subject.setPinnedFeed("transfer")
+        assertThat(subject.observePinnedFeed().first()).isEqualTo("transfer")
+        subject.setPinnedFeed(null)
+        assertThat(subject.observePinnedFeed().first()).isNull()
+    }
 }

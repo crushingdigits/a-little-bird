@@ -40,9 +40,11 @@ class FeedViewModelTest {
         override suspend fun refresh(): Result<Unit> = Result.success(Unit)
         override suspend fun isEmpty(): Boolean = flow.value.isEmpty()
     }
-    private class FakePrefs(on: Boolean) : PreferencesRepository {
+    private class FakePrefs(on: Boolean, pinned: String? = null, level: Int = 3) : PreferencesRepository {
         val protection = MutableStateFlow(on)
         val revealed = MutableStateFlow<Set<String>>(emptySet())
+        val reliabilityLevel = MutableStateFlow(level)
+        val pinnedFeed = MutableStateFlow(pinned)
         override fun observeProtection() = protection
         override fun observeRevealed() = revealed
         override suspend fun setProtection(on: Boolean) { protection.value = on }
@@ -50,6 +52,10 @@ class FeedViewModelTest {
         override suspend fun reveal(id: String) { revealed.value = revealed.value + id }
         override suspend fun revealAll(ids: Set<String>) { revealed.value = revealed.value + ids }
         override suspend fun restoreRevealed(ids: Set<String>) { revealed.value = ids }
+        override fun observeReliabilityLevel() = reliabilityLevel
+        override fun observePinnedFeed() = pinnedFeed
+        override suspend fun setReliabilityLevel(level: Int) { reliabilityLevel.value = level }
+        override suspend fun setPinnedFeed(key: String?) { pinnedFeed.value = key }
     }
 
     private fun vm(news: FakeNews, prefs: FakePrefs) = FeedViewModel(
