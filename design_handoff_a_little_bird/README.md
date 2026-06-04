@@ -20,6 +20,26 @@ Every source is labelled and carries a **reliability tier**:
 - **Tier 2 — BEAT** (blue): established beat writers (This Is Anfield, Liverpool Echo).
 - **Tier 3 — SPECULATIVE** (amber): tabloid/aggregated speculation (Mirror, Sun).
 
+### Filtering & feeds (this iteration's focus)
+The app now lets the reader **decide what they read first and how much they trust it**,
+via two orthogonal controls:
+- **News type** — a *single-select* feed switcher: **All · Transfers · Match · Squad &
+  staff · Contracts · Academy**. Picks one feed at a time.
+- **Reliability** — a *single cumulative level* (NOT multi-select): level **N shows
+  every tier from 1 down to N**. T1 = reliable only; T2 = +beat writers; T3 =
+  everything. It is a global setting that sits right beside the type switcher so it's
+  always one tap away.
+
+The two are independent: switching feeds does **not** change your reliability level
+(there is intentionally no per-type memory). Both persist across sessions, the user
+can **pin a default feed**, and filtering is fully **independent of spoiler protection**
+(a Match feed still redacts match cards when protection is on).
+
+Three alternative **surfaces** for choosing the news type are prototyped as switchable
+options (Tweaks → "Filter style"): **Tabs**, **Chips**, **Feed sheet**. These are
+design explorations — **ship ONE** (recommended: **Tabs**), documented in the
+"Filtering & feeds" section below.
+
 ## About the Design Files
 The files in this bundle are **design references created in HTML/React+Babel** —
 an interactive prototype showing the intended look and behaviour. They are **not
@@ -42,10 +62,15 @@ codebase's Material 3 theme. Exact values are documented below.
 ## Screens / Views
 
 ### 1. Feed (home)
-- **Purpose**: Primary surface. Reverse-chronological list of news cards.
-- **Layout**: Vertical scroll. Sticky top app bar (60dp). Content column with 14dp
-  horizontal padding, 12dp gap between cards, 96dp bottom padding (clears the nav
-  bar). Fixed bottom navigation (76dp).
+- **Purpose**: Primary surface. Reverse-chronological list of news cards, scoped by
+  the active **news type** and **reliability level**.
+- **Layout**: Vertical scroll. Sticky top app bar (60dp). **Filter chrome** sits
+  directly below the app bar (type switcher + reliability level — see "Filtering &
+  feeds"). Content column with 14dp horizontal padding, 12dp gap between cards, 96dp
+  bottom padding (clears the nav bar). Fixed bottom navigation (76dp).
+- **Empty state**: when no stories match the active feed + reliability level, the list
+  is replaced by a centered empty state (info tile, "Nothing here right now",
+  explanatory subtitle, and a tonal "Show all tiers" button that resets the level to 3).
 - **Components (top → bottom)**:
   - **Top app bar**: left = 34dp red rounded emblem (app-icon placeholder, replace
     with the real Liverbird mark) + wordmark "A Little Bird" (Archivo 800, 19sp) with
@@ -140,6 +165,85 @@ trailing text-button action (e.g. UNDO in `primary`). Auto-dismiss ~2.6s.
 
 ---
 
+## Filtering & feeds (detailed spec)
+
+### Data model
+- Each feed item already has a raw `cat` (`Transfer`, `Coaching`, `Match`, `Contract`,
+  `Backroom`, `Academy`) and a `tier` (1/2/3).
+- **News-type groups** map one or more raw categories to a user-facing feed
+  (`data.jsx` → `NEWS_TYPES`):
+  | key | label | short | maps to cats |
+  |---|---|---|---|
+  | `all` | All news | All | (everything) |
+  | `transfer` | Transfers | Transfers | `Transfer` |
+  | `match` | Match news | Match | `Match` |
+  | `staff` | Squad & staff | Squad & staff | `Coaching`, `Backroom` |
+  | `contract` | Contracts | Contracts | `Contract` |
+  | `academy` | Academy | Academy | `Academy` |
+
+### Filter logic (the contract — `filters.jsx` → `filterFeed`)
+```
+visible = FEED
+  .filter(i => i.tier <= tierMax)              // cumulative reliability level
+  .filter(i => type==='all' ? true             // single-select news type
+                            : group(type).cats.includes(i.cat))
+```
+- `tierMax ∈ {1,2,3}` (default **3** = show all). **Single value, not a set** — picking
+  a level shows every more-reliable tier automatically.
+- `type` is one group key (default = the pinned feed, else `all`).
+- Counts shown on tabs/chips/rows are `typeCount(typeKey, tierMax)` — the number of
+  items in that feed **at the current reliability level** (they update live as the
+  level changes).
+
+### The reliability "ladder" control (shared by all surfaces)
+A connected 3-segment control, left→right T1 T2 T3, that fills cumulatively from the
+left up to the chosen level:
+- Container: `inline-flex`, 1px outline, radius 16, `surface-container` bg, segments
+  divided by 1px hairlines (no gaps — the joined shape signals an ordinal scale, not
+  multi-select).
+- Each segment: 32dp tall, 13dp horizontal padding, Space Mono 700 / 11sp; a 7dp pip
+  (T1 green / T2 blue / T3 amber) + the label "T1/2/3".
+- **Included** segments (tier ≤ level): `surface-container-highest` bg, `on-surface`
+  text, pip at full opacity. **Excluded**: transparent, `on-dim` text, pip at 0.35.
+- **Chosen level** segment additionally carries a 3dp inset bottom accent in `primary`
+  (the "down to here" boundary marker).
+- Tap a segment → set `tierMax` to that tier.
+
+### Pin a default feed
+- A pin button (`PinBtn`) toggles whether the **current** type is the user's default
+  landing feed. Filled (`primary`) when the current feed is pinned.
+- The pinned feed key is stored; on a fresh launch the app opens on it (falls back to
+  `all`). In Tabs/Chips the pinned feed shows a small filled-pin glyph; the Feed sheet
+  has an explicit "Pin '{feed}' as default" row.
+
+### Persistence
+- All filter state persists across sessions. Prototype uses `localStorage` key
+  **`alb.filters`** = `{ type, tierMax, pinned }`. Map to DataStore/preferences natively.
+- Reliability is **global** — deliberately NOT remembered per type.
+
+### The three surfaces (ship ONE — recommend Tabs)
+**A. Tabs** *(recommended default)* — a horizontally-scrolling top tab strip for the
+news type (single-select; active tab = `primary` underline, count after each label),
+with a slim control row beneath it: the reliability ladder (labelled "RELIABILITY",
+left) + pin button (right). Bottom nav stays 2-item (Feed/Settings).
+
+**B. Chips** — one sticky bar holding, left→right: the reliability ladder, a hairline
+divider, single-select type **chips** (pill, `primary-container` when active, count
+inside), another divider, the pin button. Everything scrolls horizontally together.
+
+**C. Feed sheet** — a compact lead row: a "Feed" button (list icon + current feed
+name + chevron) on the left and the reliability ladder on the right. Tapping the
+button opens a bottom sheet ("Choose a feed") listing every feed with its count, a
+check on the active one, and a "Pin as default" action.
+
+### Interaction notes
+- Type and reliability are independent; changing one never resets the other.
+- Counts and the empty state both react to the current reliability level.
+- Spoiler protection is unchanged and orthogonal: a redacted Match card stays redacted
+  inside the Match feed until revealed/marked-watched.
+
+---
+
 ## Interactions & Behavior
 - **Protection toggle**: shield in app bar AND banner switch AND Settings master —
   all bound to one `protectionOn` boolean.
@@ -169,6 +273,13 @@ Prototype keeps everything in local React state at the App root. Native equivale
   `handling: "blur" | "quarantine"`, `autoWindow: Boolean`
 - Alerts: `cats {confirmed, rumours, coaching, contracts}`, `tier: "t1"|"t12"|"all"`,
   `quiet: Boolean`
+- **Filtering** (this iteration): `type: String` (news-type group key, default = pinned
+  or `"all"`), `tierMax: 1|2|3` (cumulative reliability level, default `3`),
+  `pinned: String|null` (default feed key), `feedOpen: Boolean` (Feed-sheet surface).
+  Handlers: `onSetTier(n)`, `onType(k)`, `onPin()` (toggles pinned↔current),
+  `resetTiers()` (→ 3). Persisted to `localStorage["alb.filters"] = {type, tierMax, pinned}`.
+  The active surface is chosen by the `filterStyle` tweak (`Tabs|Chips|Feed sheet`) —
+  in production you ship a single surface, so this is not app state.
 - Persist user prefs (protection, settings, alerts, revealed) to local storage /
   DataStore. Real implementation also needs: RSS ingestion, per-source tier mapping,
   a **match-content classifier** (keyword/category rules that decide `item.match`),
@@ -210,8 +321,11 @@ Accent (primary) is tweakable in the prototype; offered options: `#ff4d5e`,
   letter-spacing ~0.04–0.1em, 8.5–11sp.
 
 ### Radius / spacing / elevation
-- Card radius **22**, sheet/large radius **28**, chips **7–8**, buttons **full**
-  (pill, height 42–50). Icon tiles 11–13.
+- **Corner style is set to "Sharp"** (the chosen setting): card radius **12**, sheet/
+  large radius scales down accordingly. (The prototype's "Rounded" alternative uses
+  card radius **22** / large **28** — driven by the `--r-card` token via the Corners
+  tweak. Ship Sharp.) Chips **7–8**, buttons **full** (pill, height 42–50). Icon
+  tiles 11–13.
 - Spacing rhythm: 12dp card gaps, 14dp screen padding, 14–16dp card padding.
 - Switch: 52×32 track, thumb grows 16→24 when on. Tap targets ≥44dp.
 - Shadows are minimal (dark M3 relies on surface tonal steps, not heavy shadows);
@@ -231,16 +345,22 @@ Accent (primary) is tweakable in the prototype; offered options: `#ff4d5e`,
 - `A Little Bird.html` — entry point; App state, screen routing, device frame, tweaks.
 - `app.css` — all styling / design tokens (the source of truth for values above).
 - `data.jsx` — `FEED` sample items (fields: id, tier, source, author, role, cat, time,
-  confirmed, match, image, lead, paras, corrob) and `TIER_META`.
+  confirmed, match, image, lead, paras, corrob), `TIER_META`, and the filtering config
+  **`NEWS_TYPES`** (news-type groups) + `TIER_MODES` (legacy label helper).
+- `filters.jsx` — **filtering feature**: `filterFeed`/`typeCount` logic, the
+  `TierLevel` ladder, `PinBtn`, and the three type-switcher surfaces (`TypeTabs`,
+  `ChipBar`, `FeedButton`+`FeedSheet`) + `FilterEmpty` empty state.
 - `ui.jsx` — shared components: Sw, TierChip, NewsCard, RedactedCard, TopBar,
   ProtBanner, BottomNav, CatchUpCard.
-- `screens.jsx` — FeedScreen, SettingsScreen, AlertsScreen, AlertsSubscreen,
-  DetailScreen, GateSheet, CatchUpSheet, Toast.
-- `icons.jsx` — outline icon set.
+- `screens.jsx` — FeedScreen (renders the active filter surface + filtered list +
+  empty state), SettingsScreen, AlertsScreen, AlertsSubscreen, DetailScreen, GateSheet,
+  CatchUpSheet, Toast.
+- `icons.jsx` — outline icon set (now incl. `IcPin`, `IcPinFill`, `IcList`).
 - `android-frame.jsx`, `tweaks-panel.jsx` — prototype scaffolding only (the device
   bezel and the design-time tweak panel); **not** part of the app to ship.
 - Wireframes for context live in the project root (`A Little Bird - Wireframes.html`).
 
 ## How to run the prototype
 Open `A Little Bird.html` in a browser. Interact with a mouse/touch. The right-edge
-"Tweaks" panel (accent, display font, corners) is a design tool, not an app feature.
+"Tweaks" panel is a design tool, not an app feature — it switches the **Filter style**
+(Tabs/Chips/Feed sheet) and tunes accent, display font, corners.

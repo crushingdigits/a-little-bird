@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&family=Spline+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="app.css?v=3" />
+<link rel="stylesheet" href="app.css?v=6" />
 <style>
   html, body { margin: 0; padding: 0; height: 100%; background: #100d14; }
   #root { height: 100%; }
@@ -25,6 +25,7 @@
 <script type="text/babel" src="icons.jsx"></script>
 <script type="text/babel" src="data.jsx"></script>
 <script type="text/babel" src="ui.jsx"></script>
+<script type="text/babel" src="filters.jsx"></script>
 <script type="text/babel" src="screens.jsx"></script>
 
 <script type="text/babel">
@@ -33,8 +34,11 @@ const { useState, useEffect } = React;
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "accent": "#ff4d5e",
   "display": "Spline Sans",
-  "corners": "Rounded"
+  "corners": "Sharp",
+  "filterStyle": "Tabs"
 }/*EDITMODE-END*/;
+
+const PATTERN_MAP = { "Tabs": "tabs", "Chips": "chips", "Feed sheet": "sheet" };
 
 function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
@@ -47,6 +51,27 @@ function App() {
   const [gateItem, setGate] = useState(null);
   const [catchUp, setCatchUp] = useState(false);
   const [toast, setToast] = useState(null);
+
+  // ---- filters ----
+  // TYPE = single-select feed switcher · TIER = single cumulative reliability level
+  // (1=reliable only … 3=everything). Persisted across sessions.
+  const pattern = PATTERN_MAP[t.filterStyle] || "tabs";
+  const saved = React.useMemo(() => { try { return JSON.parse(localStorage.getItem("alb.filters") || "{}"); } catch (e) { return {}; } }, []);
+  const startType = saved.pinned || saved.type || "all";
+  const [type, setType] = useState(startType);
+  const [pinned, setPinned] = useState(saved.pinned || null);
+  const [tierMax, setTierMax] = useState(saved.tierMax || 3);
+  const [feedOpen, setFeedOpen] = useState(false);
+  const f = { type, tierMax };
+
+  const onSetTier = (n) => setTierMax(n);
+  const onType = (k) => setType(k);
+  const onPin = () => setPinned((p) => (p === type ? null : type));
+  const resetTiers = () => setTierMax(3);
+
+  useEffect(() => {
+    try { localStorage.setItem("alb.filters", JSON.stringify({ type, tierMax, pinned })); } catch (e) {}
+  }, [type, tierMax, pinned]);
 
   // spoiler settings
   const [types, setTypes] = useState({ scores: true, live: true, ratings: true, reports: true, previews: true, lineups: false });
@@ -102,8 +127,10 @@ function App() {
               <TopBar protectionOn={protectionOn} onToggleShield={() => setProt((p) => !p)} />
 
               {tab === "feed" && (
-                <FeedScreen protectionOn={protectionOn} onToggleProtection={() => setProt((p) => !p)}
-                  revealed={revealed} onOpen={openItem} onCatchUp={() => setCatchUp(true)} />
+                <FeedScreen pattern={pattern} protectionOn={protectionOn} onToggleProtection={() => setProt((p) => !p)}
+                  revealed={revealed} onOpen={openItem} onCatchUp={() => setCatchUp(true)}
+                  f={f} onSetTier={onSetTier} onType={onType} pinned={pinned} onPin={onPin}
+                  resetTiers={resetTiers} feedOpen={feedOpen} setFeedOpen={setFeedOpen} />
               )}
               {tab === "settings" && (
                 <SettingsScreen protectionOn={protectionOn} onToggleProtection={() => setProt((p) => !p)}
@@ -131,6 +158,10 @@ function App() {
       </div>
 
       <TweaksPanel>
+        <TweakSection label="Filtering" />
+        <TweakRadio label="Filter style" value={t.filterStyle}
+          options={["Tabs", "Chips", "Feed sheet"]}
+          onChange={(v) => setTweak("filterStyle", v)} />
         <TweakSection label="Brand" />
         <TweakColor label="Accent" value={t.accent}
           options={["#ff4d5e", "#ff3b54", "#ff6a4d"]}

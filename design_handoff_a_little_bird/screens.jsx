@@ -2,21 +2,54 @@
 const { useState, useEffect } = React;
 
 /* ---------------- FEED ---------------- */
-function FeedScreen({ protectionOn, onToggleProtection, revealed, onOpen, onCatchUp }) {
-  const held = FEED.filter((i) => i.match && !revealed.includes(i.id)).length;
+function FeedScreen({ pattern, protectionOn, onToggleProtection, revealed, onOpen, onCatchUp,
+                     f, onSetTier, onType, pinned, onPin, resetTiers,
+                     feedOpen, setFeedOpen }) {
+  const items = filterFeed(FEED, f);
+  const held = items.filter((i) => i.match && !revealed.includes(i.id)).length;
+
   return (
-    <div className="scroll">
-      <div className="scroll-pad">
-        <ProtBanner on={protectionOn} onToggle={onToggleProtection} />
-        {protectionOn && held > 0 && <CatchUpCard count={held} onClick={onCatchUp} />}
-        {FEED.map((item) => {
-          const hide = protectionOn && item.match && !revealed.includes(item.id);
-          return hide
-            ? <RedactedCard key={item.id} item={item} onOpen={onOpen} />
-            : <NewsCard key={item.id} item={item} onOpen={onOpen} />;
-        })}
+    <React.Fragment>
+      {/* ----- type switcher + always-visible reliability level ----- */}
+      {pattern === "tabs" && (
+        <React.Fragment>
+          <TypeTabs type={f.type} onType={onType} tierMax={f.tierMax} pinned={pinned} />
+          <div className="ctrlrow">
+            <TierLevel level={f.tierMax} onSet={onSetTier} showLabel />
+            <span className="sp" />
+            <PinBtn active={pinned === f.type} onToggle={onPin} />
+          </div>
+        </React.Fragment>
+      )}
+      {pattern === "chips" && (
+        <ChipBar type={f.type} onType={onType} tierMax={f.tierMax} onSetTier={onSetTier} pinned={pinned} onPin={onPin} />
+      )}
+      {pattern === "sheet" && (
+        <div className="ctrlrow lead">
+          <FeedButton type={f.type} onOpen={() => setFeedOpen(true)} />
+          <TierLevel level={f.tierMax} onSet={onSetTier} />
+        </div>
+      )}
+
+      <div className="scroll">
+        <div className="scroll-pad">
+          <ProtBanner on={protectionOn} onToggle={onToggleProtection} />
+          {protectionOn && held > 0 && <CatchUpCard count={held} onClick={onCatchUp} />}
+          {items.length === 0
+            ? <FilterEmpty onReset={resetTiers} />
+            : items.map((item) => {
+                const hide = protectionOn && item.match && !revealed.includes(item.id);
+                return hide
+                  ? <RedactedCard key={item.id} item={item} onOpen={onOpen} />
+                  : <NewsCard key={item.id} item={item} onOpen={onOpen} />;
+              })}
+        </div>
       </div>
-    </div>
+
+      {pattern === "sheet" && feedOpen && (
+        <FeedSheet type={f.type} tierMax={f.tierMax} onPick={onType} pinned={pinned} onPin={onPin} onClose={() => setFeedOpen(false)} />
+      )}
+    </React.Fragment>
   );
 }
 
