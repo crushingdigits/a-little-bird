@@ -1,7 +1,7 @@
 # News Sources & Reliability Tier — Design
 
 - **Date:** 2026-06-03
-- **Status:** Approved (brainstormed) — not yet implemented
+- **Status:** Implemented on `feat/news-sources-and-tier-reliability`
 - **Branch:** `feat/news-sources-and-tier-reliability`
 - **Scope:** Door 1 *continued* from the feed-verification effort — add curated sources and make the tier system coherent.
 
