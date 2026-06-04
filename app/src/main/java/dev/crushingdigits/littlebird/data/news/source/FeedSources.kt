@@ -24,7 +24,26 @@ object FeedSources {
             id = "bbc_liverpool",
             name = "BBC Sport — Liverpool",
             url = "https://feeds.bbci.co.uk/sport/football/teams/liverpool/rss.xml",
+            defaultTier = Tier.TIER_1_RELIABLE,
+        ),
+        FeedSource(
+            id = "guardian_liverpool",
+            name = "The Guardian — Liverpool",
+            url = "https://www.theguardian.com/football/liverpool/rss",
+            defaultTier = Tier.TIER_1_RELIABLE,
+        ),
+        FeedSource(
+            id = "david_lynch",
+            name = "David Lynch",
+            url = "https://www.davidlynchlfc.co.uk/feed",
             defaultTier = Tier.TIER_2_BEAT,
+        ),
+        FeedSource(
+            id = "fabrizio_romano",
+            name = "Fabrizio Romano",
+            url = "https://www.caughtoffside.com/author/fabrizio-romano/feed/",
+            defaultTier = Tier.TIER_2_BEAT,
+            clubScoped = false,
         ),
     )
 }

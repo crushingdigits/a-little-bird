@@ -1,5 +1,6 @@
 package dev.crushingdigits.littlebird.data.news
 
+import dev.crushingdigits.littlebird.data.news.classifier.LiverpoolRelevanceFilter
 import dev.crushingdigits.littlebird.data.news.classifier.NewsClassifier
 import dev.crushingdigits.littlebird.data.news.datasource.local.NewsLocalDataSource
 import dev.crushingdigits.littlebird.data.news.datasource.remote.NewsRemoteDataSource
@@ -23,6 +24,7 @@ class NewsRepositoryImpl(
     private val local: NewsLocalDataSource,
     private val classifier: NewsClassifier,
     private val sources: List<FeedSource>,
+    private val relevanceFilter: LiverpoolRelevanceFilter,
 ) : NewsRepository {
 
     private val sourcesById = sources.associateBy { it.id }
@@ -35,7 +37,11 @@ class NewsRepositoryImpl(
 
     override suspend fun refresh(): Result<Unit> = runCatching {
         val raw = remote.fetchAll(sources)
-        val entities = raw.map { item ->
+        val relevant = raw.filter { item ->
+            val src = sourcesById[item.sourceId]
+            src == null || src.clubScoped || relevanceFilter.isRelevant(item.title, item.description)
+        }
+        val entities = relevant.map { item ->
             val src = sourcesById[item.sourceId]
             val classification = classifier.classify(
                 title = item.title,

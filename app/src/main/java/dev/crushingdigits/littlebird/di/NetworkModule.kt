@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dev.crushingdigits.littlebird.data.news.classifier.Categoriser
+import dev.crushingdigits.littlebird.data.news.classifier.LiverpoolRelevanceFilter
 import dev.crushingdigits.littlebird.data.news.classifier.MatchClassifier
 import dev.crushingdigits.littlebird.data.news.classifier.NewsClassifier
 import dev.crushingdigits.littlebird.data.news.classifier.defaultClassifierConfig
@@ -51,4 +52,8 @@ object NetworkModule {
     @Provides
     @Singleton
     fun feedSources(): List<FeedSource> = FeedSources.all
+
+    @Provides
+    @Singleton
+    fun liverpoolRelevanceFilter(): LiverpoolRelevanceFilter = LiverpoolRelevanceFilter()
 }
