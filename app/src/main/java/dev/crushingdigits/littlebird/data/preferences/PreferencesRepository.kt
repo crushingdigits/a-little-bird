@@ -16,6 +16,14 @@ interface PreferencesRepository {
     fun observePinnedFeed(): Flow<String?>
     suspend fun setReliabilityLevel(level: Int)
     suspend fun setPinnedFeed(key: String?)
+    fun observeWatchedGames(): Flow<Set<String>>
+    suspend fun markGameWatched(id: String)
+    suspend fun unmarkGameWatched(id: String)
+    suspend fun setWatchedGames(ids: Set<String>)
+    suspend fun getFirstScheduleSyncAt(): Long?
+    suspend fun setFirstScheduleSyncAt(epochMs: Long)
+    fun observeLastScheduleSyncAt(): Flow<Long?>
+    suspend fun setLastScheduleSyncAt(epochMs: Long)
 }
 
 class PreferencesRepositoryImpl(private val source: PreferencesDataSource) : PreferencesRepository {
@@ -30,4 +38,12 @@ class PreferencesRepositoryImpl(private val source: PreferencesDataSource) : Pre
     override fun observePinnedFeed(): Flow<String?> = source.pinnedFeed
     override suspend fun setReliabilityLevel(level: Int) = source.setReliabilityLevel(level)
     override suspend fun setPinnedFeed(key: String?) = source.setPinnedFeed(key)
+    override fun observeWatchedGames(): Flow<Set<String>> = source.watchedGameIds
+    override suspend fun markGameWatched(id: String) = source.setWatchedGameIds(source.watchedGameIds.first() + id)
+    override suspend fun unmarkGameWatched(id: String) = source.setWatchedGameIds(source.watchedGameIds.first() - id)
+    override suspend fun setWatchedGames(ids: Set<String>) = source.setWatchedGameIds(ids)
+    override suspend fun getFirstScheduleSyncAt(): Long? = source.firstScheduleSyncAt.first()
+    override suspend fun setFirstScheduleSyncAt(epochMs: Long) = source.setFirstScheduleSyncAt(epochMs)
+    override fun observeLastScheduleSyncAt(): Flow<Long?> = source.lastScheduleSyncAt
+    override suspend fun setLastScheduleSyncAt(epochMs: Long) = source.setLastScheduleSyncAt(epochMs)
 }

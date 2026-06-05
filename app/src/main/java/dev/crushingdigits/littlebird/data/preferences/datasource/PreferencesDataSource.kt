@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.flow.Flow
@@ -16,11 +17,17 @@ class PreferencesDataSource(private val dataStore: DataStore<Preferences>) {
     private val revealedIdsKey = stringSetPreferencesKey("revealed_ids")
     private val reliabilityLevelKey = intPreferencesKey("reliability_level")
     private val pinnedFeedKey = stringPreferencesKey("pinned_feed")
+    private val watchedGameIdsKey = stringSetPreferencesKey("watched_game_ids")
+    private val firstScheduleSyncAtKey = longPreferencesKey("first_schedule_sync_at")
+    private val lastScheduleSyncAtKey = longPreferencesKey("last_schedule_sync_at")
 
     val protectionOn: Flow<Boolean> = dataStore.data.map { it[protectionOnKey] ?: true } // default ON
     val revealedIds: Flow<Set<String>> = dataStore.data.map { it[revealedIdsKey] ?: emptySet() }
     val reliabilityLevel: Flow<Int> = dataStore.data.map { it[reliabilityLevelKey] ?: 3 } // default 3 = all tiers
     val pinnedFeed: Flow<String?> = dataStore.data.map { it[pinnedFeedKey] }
+    val watchedGameIds: Flow<Set<String>> = dataStore.data.map { it[watchedGameIdsKey] ?: emptySet() }
+    val firstScheduleSyncAt: Flow<Long?> = dataStore.data.map { it[firstScheduleSyncAtKey] }
+    val lastScheduleSyncAt: Flow<Long?> = dataStore.data.map { it[lastScheduleSyncAtKey] }
 
     suspend fun setProtectionOn(on: Boolean) { dataStore.edit { it[protectionOnKey] = on } }
     suspend fun setRevealedIds(ids: Set<String>) { dataStore.edit { it[revealedIdsKey] = ids } }
@@ -28,4 +35,7 @@ class PreferencesDataSource(private val dataStore: DataStore<Preferences>) {
     suspend fun setPinnedFeed(key: String?) {
         dataStore.edit { if (key == null) it.remove(pinnedFeedKey) else it[pinnedFeedKey] = key }
     }
+    suspend fun setWatchedGameIds(ids: Set<String>) { dataStore.edit { it[watchedGameIdsKey] = ids } }
+    suspend fun setFirstScheduleSyncAt(epochMs: Long) { dataStore.edit { it[firstScheduleSyncAtKey] = epochMs } }
+    suspend fun setLastScheduleSyncAt(epochMs: Long) { dataStore.edit { it[lastScheduleSyncAtKey] = epochMs } }
 }

@@ -25,6 +25,17 @@ class MarkWatchedTest {
         override fun observePinnedFeed(): Flow<String?> = _pinnedFeed
         override suspend fun setReliabilityLevel(level: Int) { _reliabilityLevel.value = level }
         override suspend fun setPinnedFeed(key: String?) { _pinnedFeed.value = key }
+        private val watchedGames = MutableStateFlow<Set<String>>(emptySet())
+        private val lastSync = MutableStateFlow<Long?>(null)
+        private var firstSync: Long? = null
+        override fun observeWatchedGames(): Flow<Set<String>> = watchedGames
+        override suspend fun markGameWatched(id: String) { watchedGames.value = watchedGames.value + id }
+        override suspend fun unmarkGameWatched(id: String) { watchedGames.value = watchedGames.value - id }
+        override suspend fun setWatchedGames(ids: Set<String>) { watchedGames.value = ids }
+        override suspend fun getFirstScheduleSyncAt(): Long? = firstSync
+        override suspend fun setFirstScheduleSyncAt(epochMs: Long) { firstSync = epochMs }
+        override fun observeLastScheduleSyncAt(): Flow<Long?> = lastSync
+        override suspend fun setLastScheduleSyncAt(epochMs: Long) { lastSync.value = epochMs }
     }
 
     @Test fun `markWatched reveals all held ids and returns prior snapshot for undo`() = runTest {

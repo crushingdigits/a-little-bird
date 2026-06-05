@@ -58,4 +58,28 @@ class PreferencesRepositoryTest {
         subject.setPinnedFeed(null)
         assertThat(subject.observePinnedFeed().first()).isNull()
     }
+
+    @Test fun `watched games default empty, mark and unmark`() = runTest {
+        assertThat(subject.observeWatchedGames().first()).isEmpty()
+        subject.markGameWatched("g1")
+        subject.markGameWatched("g2")
+        assertThat(subject.observeWatchedGames().first()).containsExactly("g1", "g2")
+        subject.unmarkGameWatched("g1")
+        assertThat(subject.observeWatchedGames().first()).containsExactly("g2")
+    }
+
+    @Test fun `setWatchedGames replaces the whole set`() = runTest {
+        subject.markGameWatched("g1")
+        subject.setWatchedGames(setOf("only"))
+        assertThat(subject.observeWatchedGames().first()).containsExactly("only")
+    }
+
+    @Test fun `first and last sync timestamps are null by default and persist`() = runTest {
+        assertThat(subject.getFirstScheduleSyncAt()).isNull()
+        assertThat(subject.observeLastScheduleSyncAt().first()).isNull()
+        subject.setFirstScheduleSyncAt(111L)
+        subject.setLastScheduleSyncAt(222L)
+        assertThat(subject.getFirstScheduleSyncAt()).isEqualTo(111L)
+        assertThat(subject.observeLastScheduleSyncAt().first()).isEqualTo(222L)
+    }
 }
