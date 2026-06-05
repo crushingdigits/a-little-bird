@@ -17,6 +17,7 @@ import dev.crushingdigits.littlebird.data.news.source.FeedSource
 import dev.crushingdigits.littlebird.data.news.source.FeedSources
 import dev.crushingdigits.littlebird.data.news.tier.TierResolver
 import dev.crushingdigits.littlebird.data.news.tier.defaultTierConfig
+import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import javax.inject.Singleton
 
@@ -56,4 +57,8 @@ object NetworkModule {
     @Provides
     @Singleton
     fun liverpoolRelevanceFilter(): LiverpoolRelevanceFilter = LiverpoolRelevanceFilter()
+
+    @Provides
+    @Singleton
+    fun json(): Json = Json { ignoreUnknownKeys = true }
 }
