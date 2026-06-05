@@ -2895,15 +2895,30 @@ git rm app/src/main/java/dev/crushingdigits/littlebird/domain/usecase/MarkWatche
        app/src/main/java/dev/crushingdigits/littlebird/ui/components/ProtectionBanner.kt
 ```
 
-- [ ] **Step 3: Verify the app compiles**
+- [ ] **Step 3: Prune obsolete screenshot captures of the deleted components**
 
-Run: `./gradlew :app:compileDebugKotlin`
-Expected: BUILD SUCCESSFUL (no remaining references to the deleted symbols).
-
-- [ ] **Step 4: Commit**
+`FeedComponentsScreenshotTest.kt` captures `CatchUpCard` + `ProtectionBanner` (in both the phone and tablet classes), so deleting those components breaks the **test** source set (which `compileDebugKotlin` does NOT cover). Remove the `CatchUpCard`/`ProtectionBanner` imports and the four capture methods (`catch up card - three held`, `protection banner - on`, `protection banner - off`, `protection banner tablet - on`), then delete their orphaned baselines:
 
 ```bash
-git add app/src/main/java/dev/crushingdigits/littlebird/di/DomainModule.kt
+git rm app/src/test/screenshots/FeedComponentsScreenshotTest_catch_up_card_three_held.png \
+       app/src/test/screenshots/FeedComponentsScreenshotTest_protection_banner_on.png \
+       app/src/test/screenshots/FeedComponentsScreenshotTest_protection_banner_off.png \
+       app/src/test/screenshots/FeedComponentsTabletScreenshotTest_protection_banner_tablet_on.png
+```
+
+`ProtectionCard` is already covered by `ScheduleComponentsScreenshotTest` (Task 10.1), so no replacement capture is needed.
+
+- [ ] **Step 4: Re-record the redacted-card baseline (its copy changed in Task 11.1) and verify the whole suite**
+
+The `RedactedCard` text changed, so `FeedComponentsScreenshotTest_redacted_card_match_hidden.png` must be re-recorded.
+
+Run: `./gradlew :app:recordRoborazziDebug` then `./gradlew :app:verifyRoborazziDebug` then `./gradlew :app:testDebugUnitTest`
+Expected: all BUILD SUCCESSFUL (no remaining references to deleted symbols; screenshots verify).
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add app/src/main/java/dev/crushingdigits/littlebird/di/DomainModule.kt app/src/test/java/dev/crushingdigits/littlebird/ui/FeedComponentsScreenshotTest.kt app/src/test/screenshots/FeedComponentsScreenshotTest_redacted_card_match_hidden.png
 git commit -m "refactor: remove bulk MarkWatched, CatchUp card/sheet, and ProtectionBanner"
 ```
 
