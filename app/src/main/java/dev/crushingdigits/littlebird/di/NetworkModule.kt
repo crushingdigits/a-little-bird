@@ -17,6 +17,9 @@ import dev.crushingdigits.littlebird.data.news.source.FeedSource
 import dev.crushingdigits.littlebird.data.news.source.FeedSources
 import dev.crushingdigits.littlebird.data.news.tier.TierResolver
 import dev.crushingdigits.littlebird.data.news.tier.defaultTierConfig
+import dev.crushingdigits.littlebird.data.schedule.datasource.remote.ScheduleDataSource
+import dev.crushingdigits.littlebird.data.schedule.datasource.remote.TheSportsDbConfig
+import dev.crushingdigits.littlebird.data.schedule.datasource.remote.TheSportsDbScheduleDataSource
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import javax.inject.Singleton
@@ -61,4 +64,13 @@ object NetworkModule {
     @Provides
     @Singleton
     fun json(): Json = Json { ignoreUnknownKeys = true }
+
+    @Provides
+    @Singleton
+    fun theSportsDbConfig(): TheSportsDbConfig = TheSportsDbConfig()
+
+    @Provides
+    @Singleton
+    fun scheduleDataSource(fetcher: FeedFetcher, json: Json, config: TheSportsDbConfig): ScheduleDataSource =
+        TheSportsDbScheduleDataSource(fetcher, json, config)
 }

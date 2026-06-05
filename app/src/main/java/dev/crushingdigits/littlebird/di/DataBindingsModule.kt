@@ -14,6 +14,10 @@ import dev.crushingdigits.littlebird.data.news.source.FeedSource
 import dev.crushingdigits.littlebird.data.preferences.PreferencesRepository
 import dev.crushingdigits.littlebird.data.preferences.PreferencesRepositoryImpl
 import dev.crushingdigits.littlebird.data.preferences.datasource.PreferencesDataSource
+import dev.crushingdigits.littlebird.data.schedule.ScheduleRepository
+import dev.crushingdigits.littlebird.data.schedule.ScheduleRepositoryImpl
+import dev.crushingdigits.littlebird.data.schedule.datasource.local.ScheduleLocalDataSource
+import dev.crushingdigits.littlebird.data.schedule.datasource.remote.ScheduleDataSource
 import javax.inject.Singleton
 
 @Module
@@ -34,4 +38,9 @@ object DataBindingsModule {
     @Singleton
     fun preferencesRepository(source: PreferencesDataSource): PreferencesRepository =
         PreferencesRepositoryImpl(source)
+
+    @Provides
+    @Singleton
+    fun scheduleRepository(remote: ScheduleDataSource, local: ScheduleLocalDataSource): ScheduleRepository =
+        ScheduleRepositoryImpl(remote, local)
 }
