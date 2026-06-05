@@ -51,14 +51,14 @@ fun GateSheet(source: String, onReveal: () -> Unit, onKeepHidden: () -> Unit, on
             }
             Text("This one might spoil you", style = MaterialTheme.typography.titleLarge)
             Text(
-                "From $source. It may reveal a result or match detail.",
+                "From $source. It was published after a game you haven't marked watched — it may reveal a result.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             AssistChip(
                 onClick = {},
                 enabled = false,
-                label = { Text("MATCH CONTENT · RESULT LIKELY", color = Tier3) },
+                label = { Text("PUBLISHED AFTER AN UNWATCHED GAME", color = Tier3) },
             )
             Button(onClick = onReveal, modifier = Modifier.fillMaxWidth()) {
                 Text("Reveal anyway")
