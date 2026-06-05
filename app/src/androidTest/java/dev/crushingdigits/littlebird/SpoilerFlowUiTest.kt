@@ -10,123 +10,52 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * End-to-end UIAutomator tests for the spoiler-protection signature flow.
+ * End-to-end UIAutomator tests for the per-game spoiler wall.
  *
- * The Hilt test harness (FakeDataModule / FakePreferencesRepository) feeds the app a deterministic
- * feed of two items — one MATCH item (protection ON by default → shown as RedactedCard) and one
- * TRANSFER item. Tests verify the UI transitions that a real user would see.
+ * Fakes (FakeDataModule): one played game "Chelsea" (wall) + a match news item published after it
+ * (hidden) and a transfer item before it (visible). Protection is ON by default.
  *
- * The [onElement] predicate block is an extension on AccessibilityNodeInfo, so helper extensions
- * like [textAsString] are called without a receiver prefix. The [uiAutomator] block is an
- * extension on UiAutomatorTestScope, so methods like [startActivity] and [onElement] are called
- * directly.
- *
- * NOTE: COMPILED but NOT yet RUN on a device. Run via connectedDebugAndroidTest in Task 1B.11.
+ * NOTE: COMPILED but RUN on a device via connectedDebugAndroidTest (Task 12.3).
  */
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class SpoilerFlowUiTest {
 
-    @get:Rule
-    val hiltRule = HiltAndroidRule(this)
+    @get:Rule val hiltRule = HiltAndroidRule(this)
 
-    /**
-     * With spoiler protection ON (the fake default), the MATCH item is shown as a RedactedCard
-     * displaying "Match content hidden". Tapping it opens the GateSheet which says
-     * "This one might spoil you". Tapping "Reveal anyway" dismisses the sheet and reveals the item.
-     */
+    /** A story after the wall renders redacted; tapping opens the (date-based) gate; reveal opens the reader. */
     @Test
-    fun protected_match_card_can_be_revealed_through_the_gate() = uiAutomator {
+    fun hidden_story_can_be_revealed_through_the_gate() = uiAutomator {
         startActivity(MainActivity::class.java)
 
-        // Wait generously (10 s) for app launch + initial state emission.
-        // The RedactedCard has a Text composable with "Match content hidden".
-        val redactedCard = onElement(timeoutMs = 10_000L) {
-            textAsString() == "Match content hidden"
-        }
-        redactedCard.click()
-
-        // GateSheet should appear with its title.
-        onElement(timeoutMs = 5_000L) {
-            textAsString() == "This one might spoil you"
-        }
-
-        // Tap "Reveal anyway" — the primary button on the GateSheet.
-        val revealButton = onElement(timeoutMs = 5_000L) {
-            textAsString() == "Reveal anyway"
-        }
-        revealButton.click()
-
-        // After reveal the GateSheet is gone and the feed is visible.
-        // The ProtectionBanner with "Spoiler protection" text confirms we are back on the feed.
-        onElement(timeoutMs = 5_000L) {
-            textAsString()?.contains("Spoiler protection") == true
-        }
-    }
-
-    /**
-     * With protection ON and the MATCH item held, the CatchUpCard shows "Mark match as watched".
-     * Tapping it opens the CatchUpSheet ("All caught up?"). Tapping "Yes, reveal them" triggers
-     * onMarkWatched which emits a ShowToast action; the Snackbar message contains
-     * "match updates unlocked".
-     */
-    @Test
-    fun mark_match_as_watched_releases_held_updates() = uiAutomator {
-        startActivity(MainActivity::class.java)
-
-        // CatchUpCard appears when protectionOn=true and heldMatchCount > 0.
-        val markWatchedButton = onElement(timeoutMs = 10_000L) {
-            textAsString() == "Mark match as watched"
-        }
-        markWatchedButton.click()
-
-        // CatchUpSheet title.
-        onElement(timeoutMs = 5_000L) {
-            textAsString() == "All caught up?"
-        }
-
-        // Confirm button on the CatchUpSheet.
-        val confirmButton = onElement(timeoutMs = 5_000L) {
-            textAsString() == "Yes, reveal them"
-        }
-        confirmButton.click()
-
-        // Snackbar message — FeedViewModel emits "1 match updates unlocked".
-        onElement(timeoutMs = 5_000L) {
-            textAsString()?.contains("match updates unlocked") == true
-        }
-    }
-
-    /** Tapping a non-match (Normal) card opens the Detail reader; device-back returns to the feed. */
-    @Test
-    fun tapping_a_normal_card_opens_the_detail_reader() = uiAutomator {
-        startActivity(MainActivity::class.java)
-
-        val transferCard = onElement(timeoutMs = 10_000L) {
-            textAsString() == "Liverpool agree £65m deal for midfielder"
-        }
-        transferCard.click()
-
-        // Reader shows the primary "Open original" button.
-        onElement(timeoutMs = 5_000L) { textAsString() == "Open original" }
-
-        pressBack()
-
-        // Back on the feed.
-        onElement(timeoutMs = 5_000L) { textAsString()?.contains("Spoiler protection") == true }
-    }
-
-    /** Revealing a match card through the gate opens the reader for that item. */
-    @Test
-    fun revealing_a_match_card_opens_the_detail_reader() = uiAutomator {
-        startActivity(MainActivity::class.java)
-
-        onElement(timeoutMs = 10_000L) { textAsString() == "Match content hidden" }.click()
+        onElement(timeoutMs = 10_000L) { textAsString() == "Hidden until you catch up" }.click()
         onElement(timeoutMs = 5_000L) { textAsString() == "This one might spoil you" }
         onElement(timeoutMs = 5_000L) { textAsString() == "Reveal anyway" }.click()
-
-        // After reveal the reader opens — assert its "Open original" button (do NOT click it,
-        // to avoid launching an external browser out of the app).
+        // After reveal, the reader opens (assert its button; don't click — avoids leaving the app).
         onElement(timeoutMs = 5_000L) { textAsString() == "Open original" }
+    }
+
+    /** Opening the fixtures sheet from the protection card and marking the wall game watched shows a toast. */
+    @Test
+    fun marking_a_game_watched_releases_held_stories() = uiAutomator {
+        startActivity(MainActivity::class.java)
+
+        // The protection card's action row opens the sheet.
+        onElement(timeoutMs = 10_000L) { textAsString()?.contains("Manage") == true }.click()
+        onElement(timeoutMs = 5_000L) { textAsString() == "Fixtures & spoilers" }
+        onElement(timeoutMs = 5_000L) { textAsString() == "Mark watched" }.click()
+        // Toast confirms release.
+        onElement(timeoutMs = 5_000L) { textAsString()?.contains("unlocked") == true }
+    }
+
+    /** A non-match (before-wall) card opens the reader directly. */
+    @Test
+    fun tapping_a_visible_card_opens_the_detail_reader() = uiAutomator {
+        startActivity(MainActivity::class.java)
+
+        onElement(timeoutMs = 10_000L) { textAsString() == "Liverpool agree £65m deal for midfielder" }.click()
+        onElement(timeoutMs = 5_000L) { textAsString() == "Open original" }
+        pressBack()
+        onElement(timeoutMs = 5_000L) { textAsString()?.contains("Spoiler protection") == true }
     }
 }
