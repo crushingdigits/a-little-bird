@@ -34,17 +34,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.crushingdigits.littlebird.domain.model.NewsItem
 import dev.crushingdigits.littlebird.ui.components.AppToast
-import dev.crushingdigits.littlebird.ui.components.CatchUpCard
-import dev.crushingdigits.littlebird.ui.components.CatchUpSheet
 import dev.crushingdigits.littlebird.ui.components.GateSheet
 import dev.crushingdigits.littlebird.ui.components.NewsCard
-import dev.crushingdigits.littlebird.ui.components.ProtectionBanner
+import dev.crushingdigits.littlebird.ui.components.ProtectionCard
 import dev.crushingdigits.littlebird.ui.components.RedactedCard
 import dev.crushingdigits.littlebird.ui.components.TopBar
 import dev.crushingdigits.littlebird.ui.feed.filter.FeedTypeTabs
 import dev.crushingdigits.littlebird.ui.feed.filter.FilterEmpty
 import dev.crushingdigits.littlebird.ui.feed.filter.PinButton
 import dev.crushingdigits.littlebird.ui.feed.filter.ReliabilityLadder
+import dev.crushingdigits.littlebird.ui.feed.wall.MatchWallSheet
 import dev.crushingdigits.littlebird.ui.util.relativeTime
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -131,18 +130,12 @@ fun FeedContent(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         item {
-                            ProtectionBanner(
+                            ProtectionCard(
                                 on = state.protectionOn,
+                                hidingCount = state.hidingCount,
                                 onToggle = vm::onToggleProtection,
+                                onOpenSheet = vm::onOpenWallSheet,
                             )
-                        }
-                        if (state.protectionOn && state.heldMatchCount > 0) {
-                            item {
-                                CatchUpCard(
-                                    count = state.heldMatchCount,
-                                    onMarkWatched = vm::onRequestCatchUp,
-                                )
-                            }
                         }
                         items(state.cards, key = { it.item.id }) { card ->
                             when (card) {
@@ -171,12 +164,16 @@ fun FeedContent(
             onDismiss = vm::onDismissGate,
         )
     }
-    if (state.catchUpVisible) {
-        CatchUpSheet(
-            count = state.heldMatchCount,
-            onConfirm = vm::onMarkWatched,
-            onNotYet = vm::onDismissCatchUp,
-            onDismiss = vm::onDismissCatchUp,
+    if (state.wallSheetVisible) {
+        MatchWallSheet(
+            fixtures = state.fixtures,
+            hidingCount = state.hidingCount,
+            lastSyncAtEpochMs = state.lastSyncAt?.toEpochMilli(),
+            isOffline = state.isOffline,
+            onMarkWatched = vm::onMarkGameWatched,
+            onUnmark = vm::onUnmarkGame,
+            onRefresh = vm::onRefreshSchedule,
+            onDismiss = vm::onDismissWallSheet,
         )
     }
 }
