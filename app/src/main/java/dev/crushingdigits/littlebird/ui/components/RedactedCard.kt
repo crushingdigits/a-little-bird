@@ -72,9 +72,9 @@ fun RedactedCard(item: NewsItem, onClick: () -> Unit, modifier: Modifier = Modif
                         .background(Primary.copy(alpha = 0.2f)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(Icons.Default.Lock, contentDescription = "Match content hidden", tint = Primary)
+                    Icon(Icons.Default.Lock, contentDescription = "Hidden until you catch up", tint = Primary)
                 }
-                Text("Match content hidden", color = MaterialTheme.colorScheme.onSurface)
+                Text("Hidden until you catch up", color = MaterialTheme.colorScheme.onSurface)
                 Text(
                     "${item.source} · tap to reveal",
                     fontSize = 11.sp,
