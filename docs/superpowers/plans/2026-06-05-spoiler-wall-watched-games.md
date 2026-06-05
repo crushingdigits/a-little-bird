@@ -1050,15 +1050,33 @@ Add to `PreferencesRepositoryImpl`:
     override suspend fun setLastScheduleSyncAt(epochMs: Long) = source.setLastScheduleSyncAt(epochMs)
 ```
 
-- [ ] **Step 5: Run the tests to confirm they pass**
+- [ ] **Step 5: Satisfy the new interface in existing test fakes**
 
-Run: `./gradlew :app:testDebugUnitTest --tests "dev.crushingdigits.littlebird.data.preferences.PreferencesRepositoryTest"`
-Expected: PASS (all, including 3 new).
+> Kotlin compiles the entire `app/src/test` source set as one unit, so adding 8 methods to `PreferencesRepository` breaks every existing `FakePrefs` until they implement them. Add these 8 in-memory stubs to each `FakePrefs` in `domain/usecase/FilterPrefsUseCasesTest.kt`, `domain/usecase/MarkWatchedTest.kt`, and `ui/feed/FeedViewModelTest.kt` (these files already import `Flow`/`MutableStateFlow`). The `FeedViewModelTest` copy is overwritten in Task 8.4 and `MarkWatchedTest` is deleted in Task 11.2 — these stubs are interim; `FilterPrefsUseCasesTest`'s is permanent.
 
-- [ ] **Step 6: Commit**
+```kotlin
+    private val watchedGames = MutableStateFlow<Set<String>>(emptySet())
+    private val lastSync = MutableStateFlow<Long?>(null)
+    private var firstSync: Long? = null
+    override fun observeWatchedGames(): Flow<Set<String>> = watchedGames
+    override suspend fun markGameWatched(id: String) { watchedGames.value = watchedGames.value + id }
+    override suspend fun unmarkGameWatched(id: String) { watchedGames.value = watchedGames.value - id }
+    override suspend fun setWatchedGames(ids: Set<String>) { watchedGames.value = ids }
+    override suspend fun getFirstScheduleSyncAt(): Long? = firstSync
+    override suspend fun setFirstScheduleSyncAt(epochMs: Long) { firstSync = epochMs }
+    override fun observeLastScheduleSyncAt(): Flow<Long?> = lastSync
+    override suspend fun setLastScheduleSyncAt(epochMs: Long) { lastSync.value = epochMs }
+```
+
+- [ ] **Step 6: Run the FULL unit suite to confirm it compiles + passes**
+
+Run: `./gradlew :app:testDebugUnitTest`
+Expected: BUILD SUCCESSFUL — all tests pass (incl. the 3 new `PreferencesRepositoryTest` cases).
+
+- [ ] **Step 7: Commit**
 
 ```bash
-git add app/src/main/java/dev/crushingdigits/littlebird/data/preferences/ app/src/test/java/dev/crushingdigits/littlebird/data/preferences/PreferencesRepositoryTest.kt
+git add app/src/main/java/dev/crushingdigits/littlebird/data/preferences/ app/src/test/java/dev/crushingdigits/littlebird
 git commit -m "feat: persist watched games and schedule sync timestamps"
 ```
 
