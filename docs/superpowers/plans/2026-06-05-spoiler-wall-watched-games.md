@@ -1236,7 +1236,8 @@ import java.time.Instant
 import javax.inject.Inject
 
 /** Day-1 seed: games whose kickoff is strictly before (firstSyncAt - window) are pre-marked watched. */
-fun interface SeedWatchedOnFirstSync {
+// NOTE: a plain `interface` (not `fun interface`) — a SAM method may not declare a default param value.
+interface SeedWatchedOnFirstSync {
     operator fun invoke(games: List<Game>, firstSyncAt: Instant, windowDays: Long = 3): Set<String>
 }
 
