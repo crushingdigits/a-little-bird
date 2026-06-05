@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A Little Bird — Spoiler Wall Sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Spline+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="app.css?v=6" />
+<link rel="stylesheet" href="wall-sheet.css?v=1" />
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #0e0b12; }
+  #root { height: 100%; }
+  /* the app tokens default to Archivo display; this exploration uses Spline Sans
+     body + Archivo display, matching the live app's current tweak state. */
+  :root { --f-body: 'Spline Sans', system-ui, sans-serif; --f-display: 'Archivo', system-ui, sans-serif; }
+</style>
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100" height="100" fill="#1d1b20" />
+    <rect x="30" y="58" width="40" height="30" rx="6" fill="#322f3a" />
+    <rect x="36" y="66" width="20" height="3" rx="1.5" fill="#ff4d5e" />
+    <path d="M28 44h44" stroke="#ff4d5e" stroke-width="2" stroke-dasharray="4 4" />
+    <circle cx="50" cy="30" r="9" fill="none" stroke="#ff4d5e" stroke-width="3" />
+  </svg>
+</template>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="icons.jsx"></script>
+<script type="text/babel" src="wall-icons.jsx"></script>
+<script type="text/babel" src="wall-data.jsx"></script>
+<script type="text/babel" src="wall-crests.jsx"></script>
+<script type="text/babel" src="wall-shared.jsx"></script>
+<script type="text/babel" src="wall-sheets.jsx"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+
+<script type="text/babel">
+function App() {
+  return (
+    <DesignCanvas>
+      <DCSection id="layouts" title="Spoiler-wall sheet — segmented (chosen direction)" subtitle="Compact count-pill header, Results / Upcoming switch, scannable list. Live — mark games watched to release news and reveal scores.">
+        <DCArtboard id="b" label="Default · 3 games hiding news" width={412} height={892}>
+          <PhoneStage label="B · Segmented"><SheetSegmented /></PhoneStage>
+        </DCArtboard>
+        <DCArtboard id="b-clear" label="All watched · results still visible" width={412} height={892}>
+          <PhoneStage label="B · All caught up"><SheetSegmented initialWatched={ALL_PLAYED_IDS} /></PhoneStage>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="banner" title="Feed entry point — the protection card" subtitle="The protection card is the entry point: master toggle on top, a tappable action row below that opens the sheet. The row adapts to whether anything is hidden.">
+        <DCArtboard id="merged" label="Protection on · 3 games hiding news" width={412} height={420}>
+          <BannerStage count={3} />
+        </DCArtboard>
+        <DCArtboard id="merged-clear" label="Protection on · all caught up" width={412} height={420}>
+          <BannerStage count={0} />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="states" title="Edge states" subtitle="Loading and offline — shown on the segmented layout's shell.">
+        <DCArtboard id="loading" label="Loading · Skeleton" width={412} height={892}>
+          <PhoneStage label="Loading"><StateLoadingSheet /></PhoneStage>
+        </DCArtboard>
+        <DCArtboard id="offline" label="Offline · saved fixtures" width={412} height={892}>
+          <PhoneStage label="Offline"><SheetSegmented offline /></PhoneStage>
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

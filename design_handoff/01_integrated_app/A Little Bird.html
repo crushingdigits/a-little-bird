@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&family=Spline+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="app.css?v=6" />
+<link rel="stylesheet" href="wall-sheet.css?v=1" />
 <style>
   html, body { margin: 0; padding: 0; height: 100%; background: #100d14; }
   #root { height: 100%; }
@@ -25,6 +26,7 @@
 <script type="text/babel" src="icons.jsx"></script>
 <script type="text/babel" src="data.jsx"></script>
 <script type="text/babel" src="ui.jsx"></script>
+<script type="text/babel" src="wall.jsx"></script>
 <script type="text/babel" src="filters.jsx"></script>
 <script type="text/babel" src="screens.jsx"></script>
 
@@ -49,7 +51,8 @@ function App() {
   const [revealed, setRevealed] = useState([]);
   const [detailItem, setDetail] = useState(null);
   const [gateItem, setGate] = useState(null);
-  const [catchUp, setCatchUp] = useState(false);
+  const [wallOpen, setWallOpen] = useState(false);
+  const [watched, setWatched] = useState(() => new Set(INITIAL_WATCHED));
   const [toast, setToast] = useState(null);
 
   // ---- filters ----
@@ -91,7 +94,8 @@ function App() {
 
   const showToast = (msg, action = null) => { setToast({ msg, action }); clearTimeout(window.__tt); window.__tt = setTimeout(() => setToast(null), 2600); };
   const openItem = (item) => {
-    if (protectionOn && item.match && !revealed.includes(item.id)) setGate(item);
+    const hidden = protectionOn && item.match && item.game && !watched.has(item.game) && !revealed.includes(item.id);
+    if (hidden) setGate(item);
     else setDetail(item);
   };
   const reveal = () => {
@@ -101,14 +105,16 @@ function App() {
     setGate(null);
     setTimeout(() => setDetail(it), 80);
   };
-  const markWatched = () => {
-    const heldIds = FEED.filter((i) => i.match && !revealed.includes(i.id)).map((i) => i.id);
-    const prev = revealed;
-    setRevealed((r) => Array.from(new Set([...r, ...heldIds])));
-    setCatchUp(false);
-    showToast(heldIds.length + " match update" + (heldIds.length > 1 ? "s" : "") + " unlocked",
-      { label: "Undo", onClick: () => { setRevealed(prev); setToast(null); } });
+  // mark ONE game watched → advances the wall and releases that game's held news
+  const markWatched = (gameId) => {
+    setWatched((s) => new Set([...s, gameId]));
+    const released = FEED.filter((i) => i.match && i.game === gameId && !revealed.includes(i.id)).length;
+    if (released > 0) {
+      showToast(released + " match update" + (released > 1 ? "s" : "") + " unlocked",
+        { label: "Undo", onClick: () => { setWatched((s) => { const n = new Set(s); n.delete(gameId); return n; }); setToast(null); } });
+    }
   };
+  const unmarkWatched = (gameId) => setWatched((s) => { const n = new Set(s); n.delete(gameId); return n; });
 
   const radius = t.corners === "Sharp" ? "12px" : "22px";
   const rootStyle = {
@@ -128,7 +134,7 @@ function App() {
 
               {tab === "feed" && (
                 <FeedScreen pattern={pattern} protectionOn={protectionOn} onToggleProtection={() => setProt((p) => !p)}
-                  revealed={revealed} onOpen={openItem} onCatchUp={() => setCatchUp(true)}
+                  watched={watched} revealed={revealed} onOpen={openItem} onOpenWall={() => setWallOpen(true)}
                   f={f} onSetTier={onSetTier} onType={onType} pinned={pinned} onPin={onPin}
                   resetTiers={resetTiers} feedOpen={feedOpen} setFeedOpen={setFeedOpen} />
               )}
@@ -150,7 +156,7 @@ function App() {
 
               {detailItem && <DetailScreen item={detailItem} onClose={() => setDetail(null)} onToast={showToast} />}
               {gateItem && <GateSheet item={gateItem} onReveal={reveal} onCancel={() => setGate(null)} />}
-              {catchUp && <CatchUpSheet count={FEED.filter((i) => i.match && !revealed.includes(i.id)).length} onConfirm={markWatched} onCancel={() => setCatchUp(false)} />}
+              {wallOpen && <MatchWallSheet watched={watched} onMark={markWatched} onUnmark={unmarkWatched} onClose={() => setWallOpen(false)} />}
               {toast && <Toast key={toast.msg} msg={toast.msg} action={toast.action} />}
             </div>
           </AndroidDevice>

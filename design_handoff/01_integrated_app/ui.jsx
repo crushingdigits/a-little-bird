@@ -75,19 +75,6 @@ function TopBar({ protectionOn, onToggleShield }) {
   );
 }
 
-function ProtBanner({ on, onToggle }) {
-  return (
-    <div className={"protban" + (on ? " on" : "")} onClick={onToggle}>
-      <div className="protban-ic">{on ? <IcShieldFill s={22} /> : <IcShield s={22} />}</div>
-      <div className="protban-tx">
-        <b>Spoiler protection</b>
-        <span>{on ? "Match scores, results & reports are hidden" : "Showing everything, including match content"}</span>
-      </div>
-      <Sw on={on} onClick={onToggle} />
-    </div>
-  );
-}
-
 function BottomNav({ tab, onTab }) {
   const items = [
     { key: "feed", label: "Feed", icon: <IcHome s={24} /> },
@@ -105,19 +92,4 @@ function BottomNav({ tab, onTab }) {
   );
 }
 
-function CatchUpCard({ count, onClick }) {
-  return (
-    <div className="catchup">
-      <div style={{ display: "grid", gridTemplateColumns: "40px 1fr", alignItems: "center", gap: 12 }}>
-        <div className="catchup-ic"><IcEye s={20} /></div>
-        <div className="catchup-tx">
-          <b>{`${count} match update${count > 1 ? "s" : ""} held`}</b>
-          <span>Watched the match? Release them when you're ready.</span>
-        </div>
-      </div>
-      <button className="btn filled" onClick={onClick}><IcCheck s={17} /> Mark match as watched</button>
-    </div>
-  );
-}
-
-Object.assign(window, { Sw, TierChip, NewsCard, RedactedCard, TopBar, ProtBanner, BottomNav, CatchUpCard });
+Object.assign(window, { Sw, TierChip, NewsCard, RedactedCard, TopBar, BottomNav });

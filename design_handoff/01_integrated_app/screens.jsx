@@ -2,11 +2,11 @@
 const { useState, useEffect } = React;
 
 /* ---------------- FEED ---------------- */
-function FeedScreen({ pattern, protectionOn, onToggleProtection, revealed, onOpen, onCatchUp,
+function FeedScreen({ pattern, protectionOn, onToggleProtection, watched, revealed, onOpen, onOpenWall,
                      f, onSetTier, onType, pinned, onPin, resetTiers,
                      feedOpen, setFeedOpen }) {
   const items = filterFeed(FEED, f);
-  const held = items.filter((i) => i.match && !revealed.includes(i.id)).length;
+  const { hidingCount } = deriveWall(watched);
 
   return (
     <React.Fragment>
@@ -33,12 +33,11 @@ function FeedScreen({ pattern, protectionOn, onToggleProtection, revealed, onOpe
 
       <div className="scroll">
         <div className="scroll-pad">
-          <ProtBanner on={protectionOn} onToggle={onToggleProtection} />
-          {protectionOn && held > 0 && <CatchUpCard count={held} onClick={onCatchUp} />}
+          <ProtectionCard on={protectionOn} onToggle={onToggleProtection} hidingCount={hidingCount} onOpen={onOpenWall} />
           {items.length === 0
             ? <FilterEmpty onReset={resetTiers} />
             : items.map((item) => {
-                const hide = protectionOn && item.match && !revealed.includes(item.id);
+                const hide = protectionOn && item.match && item.game && !watched.has(item.game) && !revealed.includes(item.id);
                 return hide
                   ? <RedactedCard key={item.id} item={item} onOpen={onOpen} />
                   : <NewsCard key={item.id} item={item} onOpen={onOpen} />;
@@ -289,29 +288,6 @@ function GateSheet({ item, onReveal, onCancel }) {
   );
 }
 
-/* ---------------- CATCH-UP (mark as watched) ---------------- */
-function CatchUpSheet({ count, onConfirm, onCancel }) {
-  const [inn, setInn] = useState(false);
-  useEffect(() => { const id = setTimeout(() => setInn(true), 30); return () => clearTimeout(id); }, []);
-  const dismiss = (cb) => { setInn(false); setTimeout(cb, 300); };
-  return (
-    <>
-      <div className={"scrim" + (inn ? " in" : "")} onClick={() => dismiss(onCancel)} />
-      <div className={"sheet" + (inn ? " in" : "")}>
-        <div className="grip" />
-        <div className="gshield" style={{ background: "color-mix(in srgb, var(--t1) 18%, transparent)", color: "var(--t1)" }}><IcEye s={28} /></div>
-        <div className="gtitle">All caught up?</div>
-        <div className="gsub">Marking the match as watched reveals <b>{count} held update{count > 1 ? "s" : ""}</b> — scores, results and player ratings will be shown.</div>
-        <div className="gactions">
-          <button className="btn filled" onClick={() => dismiss(onConfirm)}>Yes, reveal {count > 1 ? "them" : "it"}</button>
-          <button className="btn tonal" onClick={() => dismiss(onCancel)}>Not yet</button>
-        </div>
-        <div className="gfoot">FUTURE MATCHES STAY PROTECTED</div>
-      </div>
-    </>
-  );
-}
-
 /* ---------------- TOAST ---------------- */
 function Toast({ msg, action }) {
   const [inn, setInn] = useState(false);
@@ -340,4 +316,4 @@ function AlertsSubscreen({ onClose, cats, toggleCat, tier, setTier, quiet, setQu
   );
 }
 
-Object.assign(window, { FeedScreen, SettingsScreen, AlertsScreen, AlertsSubscreen, DetailScreen, GateSheet, CatchUpSheet, Toast });
+Object.assign(window, { FeedScreen, SettingsScreen, AlertsScreen, AlertsSubscreen, DetailScreen, GateSheet, Toast });

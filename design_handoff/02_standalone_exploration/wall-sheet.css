@@ -1,0 +1,307 @@
+/* wall-sheet.css — spoiler-wall bottom sheet explorations.
+   Scoped with .ws- prefix. Reuses the M3 dark tokens from app.css. */
+
+/* ---------- phone stage (one per artboard) ---------- */
+.ws-screen {
+  position: relative; width: 412px; height: 892px; overflow: hidden;
+  background: var(--surface); color: var(--on);
+  font-family: var(--f-body); -webkit-font-smoothing: antialiased;
+  border-radius: 30px;
+}
+.ws-screen * { box-sizing: border-box; }
+.ws-screen *::-webkit-scrollbar { width: 0; height: 0; }
+
+/* faux feed behind the sheet (dimmed context) */
+.ws-bg { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.ws-bg .topbar { padding-top: 6px; }
+.ws-bg .scroll-pad { padding-top: 8px; gap: 12px; }
+.ws-dim { position: absolute; inset: 0; background: rgba(0,0,0,0.58); z-index: 2; }
+
+/* ---------- the sheet shell ---------- */
+.ws-sheet {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
+  background: var(--sc-high); border-radius: var(--r-lg) var(--r-lg) 0 0;
+  display: flex; flex-direction: column; max-height: 90%;
+  box-shadow: 0 -18px 50px rgba(0,0,0,0.45);
+  border-top: 1px solid var(--outline-2);
+}
+.ws-grip { width: 34px; height: 4px; border-radius: 2px; background: var(--on-dim); opacity: 0.5; margin: 10px auto 4px; flex: none; }
+.ws-head { display: flex; align-items: flex-start; gap: 12px; padding: 8px 18px 12px; flex: none; }
+.ws-head .ws-htx { flex: 1; min-width: 0; }
+.ws-head .ws-title { font-family: var(--f-display); font-weight: 800; font-size: 23px; letter-spacing: -0.015em; line-height: 1.05; }
+.ws-head .ws-sub { font-size: 12.5px; color: var(--on-var); line-height: 1.35; margin-top: 4px; text-wrap: pretty; }
+.ws-head .iconbtn { margin: -6px -6px 0 0; }
+.ws-body { overflow-y: auto; padding: 0 18px 22px; flex: 1; }
+.ws-body.pad-lg { padding-bottom: 26px; }
+
+/* count emphasis used in subtitles */
+.ws-count-pill {
+  display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 9px; border-radius: 7px;
+  font-family: var(--f-mono); font-weight: 700; font-size: 10px; letter-spacing: 0.03em; vertical-align: middle;
+  background: var(--primary-c); color: var(--on-primary-c);
+}
+
+/* ---------- shared fixture row ---------- */
+.ws-fx {
+  display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 13px;
+  padding: 13px 0; position: relative;
+}
+.ws-fx + .ws-fx { border-top: 1px solid var(--outline); }
+
+/* opponent crest stand-in */
+.ws-crest {
+  width: 44px; height: 44px; border-radius: 13px; flex: none; position: relative;
+  background: var(--sc-highest); border: 1px solid var(--outline-2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--f-mono); font-weight: 700; font-size: 12px; letter-spacing: 0.04em; color: var(--on-var);
+}
+.ws-crest.has-img { background: transparent; border: none; }
+.ws-crest-img { position: absolute; inset: 0; border-radius: 13px; overflow: hidden; }
+.ws-crest-img svg { border-radius: 13px; }
+.ws-crest .ws-ven {
+  position: absolute; right: -4px; bottom: -4px; width: 18px; height: 18px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--f-mono); font-weight: 700; font-size: 8.5px; color: var(--on);
+  background: var(--sc-highest); border: 2px solid var(--sc-high);
+}
+.ws-fx.hero-crest .ws-crest { width: 52px; height: 52px; border-radius: 15px; font-size: 14px; }
+
+.ws-fxtx { min-width: 0; }
+.ws-fxtx .ws-opp { font-family: var(--f-display); font-weight: 700; font-size: 16px; letter-spacing: -0.01em; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ws-fxtx .ws-meta { font-size: 11.5px; color: var(--on-var); margin-top: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; white-space: nowrap; overflow: hidden; }
+.ws-fxtx .ws-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--on-dim); flex: none; }
+.ws-comp { font-family: var(--f-mono); font-size: 9px; font-weight: 700; letter-spacing: 0.06em; padding: 2px 6px; border-radius: 5px; background: var(--sc-highest); color: var(--on-var); }
+.ws-comp.ucl { color: var(--t2); background: var(--t2-c); }
+
+/* trailing — watched score */
+.ws-trail { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex: none; }
+.ws-score {
+  display: inline-flex; align-items: center; gap: 7px; font-family: var(--f-display); font-weight: 800;
+  font-size: 18px; letter-spacing: 0.01em; color: var(--on); white-space: nowrap; flex: none;
+}
+.ws-rw { width: 18px; height: 18px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--f-mono); font-weight: 700; font-size: 10px; flex: none; }
+.ws-rw.W { color: var(--green); background: color-mix(in srgb, var(--green) 16%, transparent); }
+.ws-rw.D { color: var(--on-var); background: var(--sc-highest); }
+.ws-rw.L { color: var(--t3); background: var(--t3-c); }
+.ws-watchtag { font-family: var(--f-mono); font-size: 8.5px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--on-dim); display: flex; align-items: center; gap: 4px; }
+.ws-watchtag .ck { color: var(--green); display: flex; }
+
+/* trailing — hidden (unwatched, played) */
+.ws-hidden { display: inline-flex; align-items: center; gap: 7px; padding: 7px 11px; border-radius: 10px;
+  background: var(--sc-low); border: 1px dashed color-mix(in srgb, var(--primary) 32%, var(--outline-2));
+  font-family: var(--f-mono); font-size: 9.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--on-dim); }
+.ws-hidden .lk { color: var(--primary); display: flex; }
+
+/* trailing — upcoming */
+.ws-ko { text-align: right; }
+.ws-ko .t { font-family: var(--f-display); font-weight: 700; font-size: 15px; }
+.ws-ko .d { font-family: var(--f-mono); font-size: 9px; letter-spacing: 0.04em; color: var(--on-dim); text-transform: uppercase; margin-top: 2px; }
+
+/* mark-watched control (pill, full-row variants) */
+.ws-mark {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 36px; padding: 0 14px;
+  border-radius: 18px; border: none; cursor: pointer; white-space: nowrap;
+  font-family: var(--f-body); font-weight: 700; font-size: 12.5px;
+  background: var(--primary); color: var(--on-primary);
+  transition: background 0.15s var(--ease), transform 0.1s var(--ease);
+}
+.ws-mark:hover { background: color-mix(in srgb, var(--primary) 88%, #fff); }
+.ws-mark:active { transform: scale(0.96); }
+.ws-mark.tonal { background: var(--sc-highest); color: var(--on); }
+.ws-mark.tonal:hover { background: color-mix(in srgb, var(--sc-highest) 80%, #fff); }
+.ws-mark.ghost { background: transparent; color: var(--on-var); border: 1px solid var(--outline-2); }
+.ws-mark.ghost:hover { background: var(--sc); color: var(--on); }
+
+/* small undo / unmark icon button on watched rows */
+.ws-unmark { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--outline); background: transparent;
+  color: var(--on-dim); display: flex; align-items: center; justify-content: center; cursor: pointer; flex: none;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease); }
+.ws-unmark:hover { background: var(--sc); color: var(--on-var); }
+
+/* group label */
+.ws-grp { font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-dim);
+  padding: 16px 0 4px; display: flex; align-items: center; gap: 8px; }
+.ws-grp .ln { flex: 1; height: 1px; background: var(--outline); }
+
+/* =====================================================================
+   OPTION A — "The Wall" timeline
+   ===================================================================== */
+.ws-a .ws-railg { position: relative; }
+.ws-a .ws-railg::before { content: ""; position: absolute; left: 7px; top: 20px; bottom: 20px; width: 2px; background: var(--outline-2); border-radius: 2px; }
+.ws-a .ws-fx { padding-left: 30px; }
+.ws-a .ws-node { position: absolute; left: 2px; top: 50%; width: 12px; height: 12px; border-radius: 50%; transform: translateY(-50%); background: var(--sc-highest); border: 2px solid var(--on-dim); z-index: 1; }
+.ws-a .ws-fx.is-watched .ws-node { background: var(--green); border-color: var(--green); }
+.ws-a .ws-fx.is-wall .ws-node { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 25%, transparent); }
+.ws-a .ws-fx.is-upcoming .ws-node { background: var(--sc); border-style: dashed; }
+
+/* the wall marker line */
+.ws-wallmark { position: relative; margin: 6px 0 2px; padding: 11px 14px 12px 14px; border-radius: 14px;
+  background: color-mix(in srgb, var(--primary-c) 50%, var(--sc));
+  border: 1px solid color-mix(in srgb, var(--primary) 38%, transparent); }
+.ws-wallmark::before { content: ""; position: absolute; left: 0; right: 0; top: -7px; height: 1px;
+  background: repeating-linear-gradient(90deg, var(--primary) 0 7px, transparent 7px 13px); opacity: 0.6; }
+.ws-wallmark .wm-top { display: flex; align-items: center; gap: 8px; }
+.ws-wallmark .wm-tag { font-family: var(--f-mono); font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--primary); }
+.ws-wallmark .wm-tx { font-size: 12px; color: var(--on-var); line-height: 1.4; margin-top: 5px; text-wrap: pretty; }
+.ws-wallmark .wm-tx b { color: var(--on); font-weight: 700; }
+.ws-wallmark .wm-ic { width: 20px; height: 20px; color: var(--primary); display: flex; flex: none; }
+
+/* =====================================================================
+   OPTION B — "Results / Upcoming" segmented
+   ===================================================================== */
+.ws-seg { display: flex; gap: 3px; padding: 3px; border-radius: 13px; background: var(--sc-low); border: 1px solid var(--outline); margin: 0 0 4px; flex: none; }
+.ws-seg button { flex: 1; height: 38px; border-radius: 10px; border: none; cursor: pointer; background: transparent; color: var(--on-var);
+  font-family: var(--f-body); font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease); }
+.ws-seg button .sc { font-family: var(--f-mono); font-size: 10px; opacity: 0.7; }
+.ws-seg button.on { background: var(--sc-highest); color: var(--on); }
+.ws-seg button.on .sc { color: var(--primary); opacity: 1; }
+
+.ws-summary { display: flex; align-items: center; gap: 13px; padding: 14px; border-radius: 16px;
+  background: color-mix(in srgb, var(--primary-c) 40%, var(--sc)); border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+  margin: 6px 0 4px; }
+.ws-summary .su-ic { width: 46px; height: 46px; border-radius: 14px; background: var(--primary); color: var(--on-primary); display: flex; align-items: center; justify-content: center; flex: none; }
+.ws-summary .su-tx { flex: 1; min-width: 0; }
+.ws-summary .su-tx b { font-family: var(--f-display); font-weight: 800; font-size: 16px; display: block; letter-spacing: -0.01em; }
+.ws-summary .su-tx span { font-size: 12px; color: var(--on-var); display: block; margin-top: 2px; line-height: 1.35; }
+.ws-summary.clear { background: color-mix(in srgb, var(--green) 13%, var(--sc)); border-color: color-mix(in srgb, var(--green) 28%, transparent); }
+.ws-summary.clear .su-ic { background: var(--green); color: #06301f; }
+
+/* card-wrapped list for option B */
+.ws-list { background: var(--sc); border: 1px solid var(--outline); border-radius: 18px; padding: 0 15px; margin-top: 4px; }
+.ws-list .ws-fx:first-child { border-top: none; }
+
+/* =====================================================================
+   OPTION C — "Next to watch" focus / hero
+   ===================================================================== */
+.ws-hero { border-radius: 20px; padding: 18px; margin: 4px 0 6px;
+  background: linear-gradient(165deg, color-mix(in srgb, var(--primary-c) 70%, var(--sc)) 0%, var(--sc) 75%);
+  border: 1px solid color-mix(in srgb, var(--primary) 34%, transparent); }
+.ws-hero .h-eyebrow { font-family: var(--f-mono); font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--primary); display: flex; align-items: center; gap: 7px; }
+.ws-hero .h-row { display: grid; grid-template-columns: 52px 1fr; align-items: center; gap: 14px; margin: 13px 0 4px; }
+.ws-hero .h-opp { font-family: var(--f-display); font-weight: 800; font-size: 22px; letter-spacing: -0.015em; line-height: 1.05; }
+.ws-hero .h-meta { font-size: 12px; color: var(--on-var); margin-top: 4px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ws-hero .h-note { font-size: 12.5px; color: var(--on-var); line-height: 1.45; margin: 12px 0 14px; text-wrap: pretty; }
+.ws-hero .h-note b { color: var(--on); font-weight: 600; }
+.ws-hero .h-cta { width: 100%; height: 50px; border-radius: 25px; font-size: 14.5px; }
+.ws-hero .h-skip { width: 100%; height: 40px; margin-top: 9px; background: transparent; border: none; cursor: pointer; color: var(--on-var);
+  font-family: var(--f-body); font-weight: 600; font-size: 12.5px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+.ws-hero .h-skip:hover { color: var(--on); }
+
+.ws-strip-lbl { font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-dim); padding: 14px 0 9px; }
+.ws-mini { display: grid; grid-template-columns: 38px 1fr auto; align-items: center; gap: 11px; padding: 10px 12px; border-radius: 13px;
+  background: var(--sc); border: 1px solid var(--outline); }
+.ws-mini + .ws-mini { margin-top: 8px; }
+.ws-mini .ws-crest { width: 38px; height: 38px; border-radius: 11px; font-size: 11px; }
+.ws-mini .m-opp { font-family: var(--f-display); font-weight: 700; font-size: 14px; }
+.ws-mini .m-meta { font-size: 10.5px; color: var(--on-dim); margin-top: 2px; }
+
+/* =====================================================================
+   FEED BANNER (entry points)
+   ===================================================================== */
+.ws-banner { cursor: pointer; transition: background 0.15s var(--ease), border-color 0.15s var(--ease); }
+
+/* B1 — inline strip */
+.ws-banner.b1 { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 13px; padding: 13px 14px;
+  border-radius: var(--r-card); background: color-mix(in srgb, var(--primary-c) 42%, var(--sc)); border: 1px solid color-mix(in srgb, var(--primary) 32%, transparent); }
+.ws-banner.b1 .bn-ic { width: 40px; height: 40px; border-radius: 12px; background: var(--primary); color: var(--on-primary); display: flex; align-items: center; justify-content: center; flex: none; }
+.ws-banner.b1 .bn-tx b { font-family: var(--f-display); font-weight: 700; font-size: 14.5px; display: block; }
+.ws-banner.b1 .bn-tx span { font-size: 12px; color: var(--on-var); display: block; margin-top: 2px; line-height: 1.3; }
+.ws-banner.b1 .bn-go { font-family: var(--f-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--primary); display: inline-flex; align-items: center; gap: 4px; flex: none; }
+
+/* B2 — compact count chip line (sits under the feed filter row) */
+.ws-banner.b2 { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-radius: 14px;
+  background: var(--sc); border: 1px solid var(--outline-2); }
+.ws-banner.b2 .bn-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); flex: none; box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 22%, transparent); }
+.ws-banner.b2 .bn-main { flex: 1; font-size: 13px; color: var(--on); }
+.ws-banner.b2 .bn-main b { font-weight: 700; }
+.ws-banner.b2 .bn-cta { font-family: var(--f-body); font-weight: 700; font-size: 12px; color: var(--primary); display: inline-flex; align-items: center; gap: 4px; flex: none; }
+
+/* ---- coexistence with the spoiler-protection card ---- */
+/* MERGED — the protection card itself becomes the entry point.
+   Toggle stays the master on/off; a tappable action row is added below. */
+.ws-protcard { border-radius: var(--r-card); background: color-mix(in srgb, var(--primary-c) 42%, var(--sc));
+  border: 1px solid color-mix(in srgb, var(--primary) 35%, transparent); overflow: hidden; }
+.ws-protcard .pc-top { display: flex; align-items: center; gap: 13px; padding: 14px 16px; }
+.ws-protcard .pc-ic { width: 40px; height: 40px; border-radius: 12px; flex: none; display: flex; align-items: center; justify-content: center; background: var(--primary); color: var(--on-primary); }
+.ws-protcard .pc-tx { flex: 1; min-width: 0; }
+.ws-protcard .pc-tx b { font-family: var(--f-display); font-weight: 700; font-size: 15.5px; display: block; }
+.ws-protcard .pc-tx span { font-size: 12px; color: var(--on-var); display: block; margin-top: 2px; line-height: 1.3; }
+.ws-protcard .pc-div { height: 1px; background: color-mix(in srgb, var(--primary) 22%, var(--outline)); margin: 0 16px; }
+.ws-protcard .pc-action { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 16px; background: transparent; border: none; cursor: pointer;
+  font-family: var(--f-body); color: var(--on); text-align: left; transition: background 0.15s var(--ease); }
+.ws-protcard .pc-action:hover { background: color-mix(in srgb, var(--primary) 8%, transparent); }
+.ws-protcard .pc-action .pa-lk { width: 26px; height: 26px; border-radius: 8px; background: var(--primary-c); color: var(--primary); display: flex; align-items: center; justify-content: center; flex: none; }
+.ws-protcard .pc-action .pa-lk.ok { background: color-mix(in srgb, var(--green) 18%, transparent); color: var(--green); }
+.ws-protcard .pc-action .pa-tx { flex: 1; font-size: 13px; }
+.ws-protcard .pc-action .pa-tx b { font-weight: 700; }
+.ws-protcard .pc-action .pa-cta { font-weight: 700; font-size: 12px; color: var(--primary); display: inline-flex; align-items: center; gap: 3px; flex: none; }
+
+/* label above each coexistence demo */
+.ws-demo-lbl { font-family: var(--f-mono); font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--on-dim);
+  display: flex; align-items: center; gap: 8px; padding: 2px 2px 10px; }
+.ws-demo-lbl .ln { flex: 1; height: 1px; background: var(--outline); }
+
+/* B3 — gap divider in the feed (where hidden news begins) */
+.ws-banner.b3 { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 9px; padding: 18px 16px;
+  border-radius: var(--r-card); background: var(--sc-low); border: 1px dashed color-mix(in srgb, var(--primary) 30%, var(--outline-2)); }
+.ws-banner.b3 .bn-line { display: flex; align-items: center; gap: 10px; width: 100%; }
+.ws-banner.b3 .bn-line .ln { flex: 1; height: 1px; background: var(--outline-2); }
+.ws-banner.b3 .bn-line .lk { width: 30px; height: 30px; border-radius: 9px; background: var(--primary-c); color: var(--primary); display: flex; align-items: center; justify-content: center; flex: none; }
+.ws-banner.b3 .bn-h { font-family: var(--f-display); font-weight: 700; font-size: 14.5px; }
+.ws-banner.b3 .bn-s { font-size: 12px; color: var(--on-var); line-height: 1.4; max-width: 280px; }
+.ws-banner.b3 .bn-btn { margin-top: 4px; }
+
+/* =====================================================================
+   STATES — empty / loading / offline
+   ===================================================================== */
+.ws-state { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 11px; padding: 40px 28px 36px; }
+.ws-state .st-ic { width: 64px; height: 64px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 4px; }
+.ws-state .st-h { font-family: var(--f-display); font-weight: 800; font-size: 21px; letter-spacing: -0.01em; }
+.ws-state .st-s { font-size: 13.5px; color: var(--on-var); line-height: 1.5; max-width: 270px; }
+.ws-state .st-ic.ok { background: color-mix(in srgb, var(--green) 16%, var(--sc-highest)); color: var(--green); }
+.ws-state .st-ic.off { background: var(--sc-highest); color: var(--on-dim); }
+.ws-state .btn { margin-top: 8px; }
+.ws-state .st-meta { font-family: var(--f-mono); font-size: 9.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--on-dim); margin-top: 6px; }
+
+/* empty — recap of next fixture */
+.ws-next-card { width: 100%; margin-top: 16px; display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 13px;
+  padding: 14px; border-radius: 16px; background: var(--sc); border: 1px solid var(--outline); text-align: left; }
+
+/* loading skeleton */
+.ws-skel-row { display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 13px; padding: 13px 0; }
+.ws-skel-row + .ws-skel-row { border-top: 1px solid var(--outline); }
+.ws-sk { background: linear-gradient(100deg, var(--sc) 30%, var(--sc-highest) 50%, var(--sc) 70%);
+  background-size: 220% 100%; border-radius: 8px; animation: ws-shimmer 1.3s var(--ease) infinite; }
+.ws-sk.crest { width: 44px; height: 44px; border-radius: 13px; }
+.ws-sk.line { height: 13px; }
+.ws-sk.pill { width: 56px; height: 26px; border-radius: 13px; }
+@keyframes ws-shimmer { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+@media (prefers-reduced-motion: reduce) { .ws-sk { animation: none; } }
+
+/* persistent status bar — last-updated + refresh, always shown above the list.
+   Escalates to a connection warning when offline. */
+.ws-statusbar { display: flex; align-items: center; gap: 9px; padding: 8px 11px; border-radius: 12px;
+  background: var(--sc-low); border: 1px solid var(--outline); margin: 4px 0 10px; }
+.ws-statusbar .sb-ic { color: var(--on-dim); flex: none; display: flex; }
+.ws-statusbar .sb-tx { flex: 1; min-width: 0; font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--on-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ws-statusbar .sb-tx b { color: var(--on-var); font-weight: 700; }
+.ws-statusbar .sb-btn { flex: none; height: 30px; padding: 0 11px; border-radius: 15px; border: 1px solid var(--outline-2); background: transparent; color: var(--on);
+  font-family: var(--f-body); font-weight: 700; font-size: 11.5px; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; transition: background 0.15s var(--ease); }
+.ws-statusbar .sb-btn:hover { background: var(--sc); }
+.ws-statusbar.offline { background: color-mix(in srgb, var(--primary-c) 24%, var(--sc-low)); border-color: color-mix(in srgb, var(--primary) 26%, var(--outline)); }
+.ws-statusbar.offline .sb-ic { color: var(--primary); }
+.ws-statusbar.offline .sb-tx b { color: var(--on); }
+
+/* offline cached note */
+.ws-offline-note { display: flex; align-items: flex-start; gap: 11px; width: 100%; margin-top: 16px; padding: 13px 14px; border-radius: 14px;
+  background: var(--sc); border: 1px solid var(--outline); text-align: left; }
+.ws-offline-note .on-ic { color: var(--green); flex: none; margin-top: 1px; }
+.ws-offline-note .on-tx { font-size: 12.5px; color: var(--on-var); line-height: 1.45; }
+.ws-offline-note .on-tx b { color: var(--on); font-weight: 700; }
+
+/* sheet footer note shared */
+.ws-foot { font-family: var(--f-mono); font-size: 9.5px; letter-spacing: 0.04em; color: var(--on-dim); text-align: center; padding: 14px 0 2px; display: flex; align-items: center; justify-content: center; gap: 7px; }
+.ws-foot .sh { color: var(--primary); display: flex; }

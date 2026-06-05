@@ -17,7 +17,7 @@ const FEED = [
   },
   {
     id: "ft", tier: 1, source: "Liverpool FC", author: "Liverpool FC", role: "Official club",
-    cat: "Match", time: "14m", confirmed: false, match: true, image: false,
+    cat: "Match", time: "14m", confirmed: false, match: true, game: "che", image: false,
     headline: "Full-time report: official match summary now live",
     lead: "The club's official full-time report covering the result, goals and key moments is now available.",
     paras: ["This article contains the final score and a breakdown of how the match unfolded."],
@@ -39,7 +39,7 @@ const FEED = [
   },
   {
     id: "match1", tier: 2, source: "BBC Sport", author: "BBC Sport", role: "Match coverage",
-    cat: "Match", time: "22m", confirmed: false, match: true, image: false,
+    cat: "Match", time: "22m", confirmed: false, match: true, game: "eve", image: false,
     headline: "Match report: full-time ratings & tactical breakdown",
     lead: "A full-time report covering the result, key moments and player performances.",
     paras: ["This article contains the final score and match details."],
@@ -47,7 +47,7 @@ const FEED = [
   },
   {
     id: "live", tier: 2, source: "Liverpool Echo", author: "Liverpool Echo", role: "Live coverage",
-    cat: "Match", time: "28m", confirmed: false, match: true, image: false,
+    cat: "Match", time: "28m", confirmed: false, match: true, game: "new", image: false,
     headline: "Live: second-half flashpoints and key incidents",
     lead: "Rolling live coverage of the second half, including chances, bookings and tactical changes.",
     paras: ["This live blog reveals the current scoreline and how the game is developing."],
@@ -104,7 +104,7 @@ const FEED = [
   },
   {
     id: "match2", tier: 2, source: "The Athletic", author: "The Athletic", role: "Match coverage",
-    cat: "Match", time: "1h", confirmed: false, match: true, image: false,
+    cat: "Match", time: "1h", confirmed: false, match: true, game: "che", image: false,
     headline: "Player ratings: who shone and who struggled",
     lead: "Individual performance ratings from the latest fixture.",
     paras: ["This article reveals how each player performed and implies the result."],
