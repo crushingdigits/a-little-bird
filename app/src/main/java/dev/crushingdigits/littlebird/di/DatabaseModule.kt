@@ -12,6 +12,7 @@ import dev.crushingdigits.littlebird.data.news.datasource.local.NewsDao
 import dev.crushingdigits.littlebird.data.news.datasource.local.NewsLocalDataSource
 import dev.crushingdigits.littlebird.data.schedule.datasource.local.GameDao
 import dev.crushingdigits.littlebird.data.schedule.datasource.local.ScheduleLocalDataSource
+import java.time.Clock
 import javax.inject.Singleton
 
 @Module
@@ -38,4 +39,8 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun scheduleLocalDataSource(dao: GameDao) = ScheduleLocalDataSource(dao)
+
+    @Provides
+    @Singleton
+    fun clock(): Clock = Clock.systemUTC()
 }
