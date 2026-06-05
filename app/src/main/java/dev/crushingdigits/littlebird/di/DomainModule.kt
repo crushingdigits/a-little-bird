@@ -10,8 +10,6 @@ import dev.crushingdigits.littlebird.domain.usecase.FilterFeed
 import dev.crushingdigits.littlebird.domain.usecase.FilterFeedUseCase
 import dev.crushingdigits.littlebird.domain.usecase.MarkGameWatched
 import dev.crushingdigits.littlebird.domain.usecase.MarkGameWatchedUseCase
-import dev.crushingdigits.littlebird.domain.usecase.MarkWatched
-import dev.crushingdigits.littlebird.domain.usecase.MarkWatchedUseCase
 import dev.crushingdigits.littlebird.domain.usecase.ObserveFeed
 import dev.crushingdigits.littlebird.domain.usecase.ObserveFeedUseCase
 import dev.crushingdigits.littlebird.domain.usecase.ObserveLastSyncAt
@@ -58,7 +56,6 @@ abstract class DomainModule {
     @Binds abstract fun observeRevealed(impl: ObserveRevealedUseCase): ObserveRevealed
     @Binds abstract fun toggleProtection(impl: ToggleProtectionUseCase): ToggleProtection
     @Binds abstract fun revealItem(impl: RevealItemUseCase): RevealItem
-    @Binds abstract fun markWatched(impl: MarkWatchedUseCase): MarkWatched
     @Binds abstract fun restoreRevealed(impl: RestoreRevealedUseCase): RestoreRevealed
     @Binds abstract fun observeNewsItem(impl: ObserveNewsItemUseCase): ObserveNewsItem
     @Binds internal abstract fun filterFeed(impl: FilterFeedUseCase): FilterFeed

@@ -16,9 +16,7 @@ import com.github.takahirom.roborazzi.captureRoboImage
 import dev.crushingdigits.littlebird.domain.model.Category
 import dev.crushingdigits.littlebird.domain.model.NewsItem
 import dev.crushingdigits.littlebird.domain.model.Tier
-import dev.crushingdigits.littlebird.ui.components.CatchUpCard
 import dev.crushingdigits.littlebird.ui.components.NewsCard
-import dev.crushingdigits.littlebird.ui.components.ProtectionBanner
 import dev.crushingdigits.littlebird.ui.components.RedactedCard
 import dev.crushingdigits.littlebird.ui.theme.LittleBirdTheme
 import org.junit.Rule
@@ -146,27 +144,6 @@ class FeedComponentsScreenshotTest {
             )
         }
     }
-
-    @Test
-    fun `catch up card - three held`() {
-        composeTestRule.captureThemed("FeedComponentsScreenshotTest_catch_up_card_three_held.png") {
-            CatchUpCard(count = 3, onMarkWatched = {})
-        }
-    }
-
-    @Test
-    fun `protection banner - on`() {
-        composeTestRule.captureThemed("FeedComponentsScreenshotTest_protection_banner_on.png") {
-            ProtectionBanner(on = true, onToggle = {})
-        }
-    }
-
-    @Test
-    fun `protection banner - off`() {
-        composeTestRule.captureThemed("FeedComponentsScreenshotTest_protection_banner_off.png") {
-            ProtectionBanner(on = false, onToggle = {})
-        }
-    }
 }
 
 @RunWith(RobolectricTestRunner::class)
@@ -188,13 +165,6 @@ class FeedComponentsTabletScreenshotTest {
                 relativeTime = "2h ago",
                 onClick = {},
             )
-        }
-    }
-
-    @Test
-    fun `protection banner tablet - on`() {
-        composeTestRule.captureThemed("FeedComponentsTabletScreenshotTest_protection_banner_tablet_on.png") {
-            ProtectionBanner(on = true, onToggle = {})
         }
     }
 }
