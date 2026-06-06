@@ -3141,25 +3141,19 @@ Expected: PASS — no unexpected diffs.
 
 ### Task 12.2: Close coverage gaps (kover)
 
-- [ ] **Step 1: Invoke the `/write-unit-tests` skill — Workflow section**
+> **N/A for this project** — there is no kover plugin/task configured (`grep kover` is empty; no `unitTestsDebug`/`koverXmlReport` task exists). Coverage is instead ensured by the per-phase TDD: every new use case (`ComputeSpoilerWall`, `SeedWatchedOnFirstSync`, `SyncSchedule`, …), mapper, repository, and the rewritten `FeedViewModel` landed with dedicated tests. If kover is added later, run its report and close any gaps in `data/schedule/**` and the new domain/UI code.
 
-Follow `/write-unit-tests` (Workflow): it runs the project's `unitTestsDebug koverXmlReport --rerun-tasks`, identifies uncovered lines in the new `data/schedule/**`, `domain/usecase/*Schedule*`/`*Wall*`/`*Game*`, `ui/feed/FixtureUi.kt`, and `FeedViewModel`, adds targeted tests to close gaps, and runs detekt. Commit any added tests.
+### Task 12.3: Instrumented tests on a device
 
-- [ ] **Step 2: Commit (only if the workflow added tests)**
-
-```bash
-git add app/src/test
-git commit -m "test: close schedule/wall coverage gaps"
-```
-
-### Task 12.3: Emulator tests on a device
-
-- [ ] **Step 1: With an emulator/device connected, run the instrumented suite**
+- [ ] **Step 1: With a device connected, run the instrumented suite** (`ANDROID_SERIAL=<id>` to target it)
 
 Run: `./gradlew :app:connectedDebugAndroidTest`
-Expected: PASS — `SpoilerFlowUiTest` (3 tests) + `FilterFlowUiTest` green.
+Expected: PASS — `SpoilerFlowUiTest` (3 tests) + `FilterFlowUiTest` (1 test).
 
-> If no device is available, follow `/write-ui-tests` (Workflow) to launch one first. Do not mark this task done without a real run.
+> Two bugs were found ONLY by running on a device (Pixel 7 Pro) — captured in commit `f20757f`:
+> 1. **Seed-window vs fake data.** `FakeDataModule` used epoch-1970 timestamps; `FeedScreen`'s launch `onRefresh()` → `SyncSchedule` first-run seeding auto-marked the ancient game watched, clearing the wall (so nothing was hidden). Fix: relative-to-now fixture timestamps (game ~1 day ago — played but within the 3-day window). Unit tests missed this because they don't trigger `onRefresh`.
+> 2. **Snackbar behind the modal sheet.** The "N stories unlocked" toast renders behind the open `MatchWallSheet`, so it's unreachable to UIAutomator (and largely to the user — the in-sheet Undo covers it). The mark-watched test now closes the sheet and asserts the **feed release** (the redacted card is replaced by the real story title) — the true end-to-end check.
+> Also: `FilterFlowUiTest` (pre-existing) asserted the old `"Match content hidden"` copy → updated to `"Hidden until you catch up"`.
 
 ### Task 12.4: Manual test plan (human verification CI cannot do)
 
