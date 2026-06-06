@@ -25,13 +25,15 @@ class FakeNewsRepository : NewsRepository {
                 id = "match-1", source = "BBC Sport", tier = Tier.TIER_2_BEAT, category = Category.MATCH,
                 isMatch = true, confirmed = false, author = null, role = null,
                 title = "Match result hidden under spoiler protection", summary = "Full-time report.",
-                link = "https://x/m1", imageUrl = null, publishedAt = Instant.ofEpochMilli(2_000), // after the wall -> hidden
+                link = "https://x/m1", imageUrl = null,
+                publishedAt = Instant.now().minusSeconds(3_600), // ~1h ago: after the wall -> hidden
             ),
             NewsItem(
                 id = "transfer-1", source = "Fabrizio Romano", tier = Tier.TIER_1_RELIABLE, category = Category.TRANSFER,
                 isMatch = false, confirmed = true, author = null, role = null,
                 title = "Liverpool agree £65m deal for midfielder", summary = "Here we go.",
-                link = "https://x/t1", imageUrl = null, publishedAt = Instant.ofEpochMilli(1_000), // before the wall -> visible
+                link = "https://x/t1", imageUrl = null,
+                publishedAt = Instant.now().minusSeconds(2 * 24 * 3_600), // ~2 days ago: before the wall -> visible
             ),
         ),
     )
@@ -42,12 +44,15 @@ class FakeNewsRepository : NewsRepository {
 }
 
 class FakeScheduleRepository : ScheduleRepository {
-    // One played game at epoch 1500ms -> wall = 1500ms; the match item (2000ms) is hidden, transfer (1000ms) is visible.
+    // One game played ~1 day ago: PLAYED (so it forms the wall) but WITHIN the 3-day seed window, so
+    // SyncSchedule's first-run seeding does NOT auto-mark it watched. Timestamps are relative to now
+    // because the production Clock is the real system clock. -> wall = ~1 day ago; the match item
+    // (~1h ago) is hidden, the transfer item (~2 days ago) is visible.
     private val games = MutableStateFlow(
         listOf(
             Game(
                 id = "g1", opponent = "Chelsea", abbreviation = "CHE", isHome = true, competition = "English Premier League",
-                kickoff = Instant.ofEpochMilli(1_500), homeScore = 2, awayScore = 1,
+                kickoff = Instant.now().minusSeconds(24 * 3_600), homeScore = 2, awayScore = 1,
             ),
         ),
     )

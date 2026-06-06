@@ -44,8 +44,11 @@ class SpoilerFlowUiTest {
         onElement(timeoutMs = 10_000L) { textAsString()?.contains("Manage") == true }.click()
         onElement(timeoutMs = 5_000L) { textAsString() == "Fixtures & spoilers" }
         onElement(timeoutMs = 5_000L) { textAsString() == "Mark watched" }.click()
-        // Toast confirms release.
-        onElement(timeoutMs = 5_000L) { textAsString()?.contains("unlocked") == true }
+        // Close the sheet; marking the wall game releases the previously-hidden story in the feed
+        // (the redacted card is replaced by the real story title). This is the true end-to-end check —
+        // the "N stories unlocked" snackbar renders behind the modal sheet and isn't asserted here.
+        pressBack()
+        onElement(timeoutMs = 5_000L) { textAsString() == "Match result hidden under spoiler protection" }
     }
 
     /** A non-match (before-wall) card opens the reader directly. */

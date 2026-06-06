@@ -32,7 +32,7 @@ class FilterFlowUiTest {
         onElement(timeoutMs = 10_000L) { viewIdResourceName == "feedTab_match" }.click()
 
         // Default reliability is 3 -> the T2 match item shows as a redacted card.
-        onElement(timeoutMs = 5_000L) { textAsString()?.contains("Match content hidden") == true }
+        onElement(timeoutMs = 5_000L) { textAsString()?.contains("Hidden until you catch up") == true }
 
         // Lower reliability to T1 -> the only match item (T2) is excluded -> empty feed.
         onElement(timeoutMs = 5_000L) { viewIdResourceName == "tier_1" }.click()
@@ -40,6 +40,6 @@ class FilterFlowUiTest {
 
         // "Show all tiers" resets the level to 3 -> the redacted match card returns.
         onElement(timeoutMs = 5_000L) { viewIdResourceName == "showAllTiers" }.click()
-        onElement(timeoutMs = 5_000L) { textAsString()?.contains("Match content hidden") == true }
+        onElement(timeoutMs = 5_000L) { textAsString()?.contains("Hidden until you catch up") == true }
     }
 }
