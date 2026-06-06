@@ -30,6 +30,7 @@ import dev.crushingdigits.littlebird.domain.model.MatchResult
 import dev.crushingdigits.littlebird.ui.feed.FixtureState
 import dev.crushingdigits.littlebird.ui.feed.FixtureUi
 import dev.crushingdigits.littlebird.ui.theme.Confirmed
+import dev.crushingdigits.littlebird.ui.theme.Primary
 import dev.crushingdigits.littlebird.ui.theme.Tier3
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -51,6 +52,9 @@ fun FixtureRow(
     ) {
         CrestTile(fixture)
         Column(Modifier.weight(1f)) {
+            if (fixture.isWall) {
+                Text("NEXT TO CATCH UP", style = MaterialTheme.typography.labelSmall, color = Primary)
+            }
             Text(fixture.opponent, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(
                 buildString {
